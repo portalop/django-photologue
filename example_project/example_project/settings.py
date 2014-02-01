@@ -95,6 +95,7 @@ INSTALLED_APPS = [
     # but not actually added a sitemap in urls.py.
     'django.contrib.sitemaps',
     'photologue',
+    'sortedm2m',
     'south',
     'example_project',
 ]

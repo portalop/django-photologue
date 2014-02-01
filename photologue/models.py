@@ -41,6 +41,8 @@ except ImportError:
         raise ImportError(
             'Photologue was unable to import the Python Imaging Library. Please confirm it`s installed and available on your current Python path.')
 
+from sortedm2m.fields import SortedManyToManyField
+
 # attempt to load the django-tagging TagField from default location,
 # otherwise we substitude a dummy TagField.
 try:
@@ -137,7 +139,7 @@ filter_names = []
 for n in dir(ImageFilter):
     klass = getattr(ImageFilter, n)
     if isclass(klass) and issubclass(klass, ImageFilter.BuiltinFilter) and \
-    hasattr(klass, 'name'):
+        hasattr(klass, 'name'):
         filter_names.append(klass.__name__)
 IMAGE_FILTERS_HELP_TEXT = _(
     'Chain multiple filters using the following pattern "FILTER_ONE->FILTER_TWO->FILTER_THREE". Image filters will be applied in order. The following filters are available: %s.' % (', '.join(filter_names)))
@@ -158,11 +160,11 @@ class Gallery(models.Model):
                                     default=True,
                                     help_text=_('Public galleries will be displayed '
                                     'in the default views.'))
-    photos = models.ManyToManyField('Photo',
-                                    related_name='galleries',
-                                    verbose_name=_('photos'),
-                                    null=True,
-                                    blank=True)
+    photos = SortedManyToManyField('Photo',
+                                   related_name='galleries',
+                                   verbose_name=_('photos'),
+                                   null=True,
+                                   blank=True)
     tags = TagField(help_text=tagfield_help_text, verbose_name=_('tags'))
 
     class Meta:
@@ -434,9 +436,11 @@ class ImageModel(models.Model):
             elif self.crop_from == 'left':
                 box = (0, int(y_diff), new_width, int(y_diff + new_height))
             elif self.crop_from == 'bottom':
-                box = (int(x_diff), int(yd), int(x_diff + new_width), int(y))  # y - yd = new_height
+                # y - yd = new_height
+                box = (int(x_diff), int(yd), int(x_diff + new_width), int(y))
             elif self.crop_from == 'right':
-                box = (int(xd), int(y_diff), int(x), int(y_diff + new_height))  # x - xd = new_width
+                # x - xd = new_width
+                box = (int(xd), int(y_diff), int(x), int(y_diff + new_height))
             else:
                 box = (int(x_diff), int(y_diff), int(x_diff + new_width), int(y_diff + new_height))
             im = im.resize((int(x), int(y)), Image.ANTIALIAS).crop(box)
@@ -637,7 +641,8 @@ class BaseEffect(models.Model):
         try:
             im = Image.open(SAMPLE_IMAGE_PATH)
         except IOError:
-            raise IOError('Photologue was unable to open the sample image: %s.' % SAMPLE_IMAGE_PATH)
+            raise IOError(
+                'Photologue was unable to open the sample image: %s.' % SAMPLE_IMAGE_PATH)
         im = self.process(im)
         im.save(self.sample_filename(), 'JPEG', quality=90, optimize=True)
 
@@ -684,6 +689,7 @@ class BaseEffect(models.Model):
 
 
 class PhotoEffect(BaseEffect):
+
     """ A pre-defined effect to apply to photos """
     transpose_method = models.CharField(_('rotate or flip'),
                                         max_length=15,
@@ -741,7 +747,8 @@ class PhotoEffect(BaseEffect):
 
     def post_process(self, im):
         if self.reflection_size != 0.0:
-            im = add_reflection(im, bgcolor=self.background_color, amount=self.reflection_size, opacity=self.reflection_strength)
+            im = add_reflection(im, bgcolor=self.background_color,
+                                amount=self.reflection_size, opacity=self.reflection_strength)
         return im
 
 
@@ -766,6 +773,7 @@ class Watermark(BaseEffect):
 
 
 class PhotoSize(models.Model):
+
     """About the Photosize name: it's used to create get_PHOTOSIZE_url() methods,
     so the name has to follow the same restrictions as any Python method name, 
     e.g. no spaces or non-ascii characters."""
@@ -773,10 +781,11 @@ class PhotoSize(models.Model):
     name = models.CharField(_('name'),
                             max_length=40,
                             unique=True,
-                            help_text=_('Photo size name should contain only letters, numbers and underscores. Examples: "thumbnail", "display", "small", "main_page_widget".'),
+                            help_text=_(
+                                'Photo size name should contain only letters, numbers and underscores. Examples: "thumbnail", "display", "small", "main_page_widget".'),
                             validators=[RegexValidator(regex='^[a-z0-9_]+$',
-                               message='Use only plain lowercase letters (ASCII), numbers and underscores.'
-                               )]
+                                                       message='Use only plain lowercase letters (ASCII), numbers and underscores.'
+                                                       )]
                             )
     width = models.PositiveIntegerField(_('width'),
                                         default=0,
@@ -830,7 +839,8 @@ class PhotoSize(models.Model):
     def clean(self):
         if self.crop is True:
             if self.width == 0 or self.height == 0:
-                raise ValidationError(_("Can only crop photos if both width and height dimensions are set."))
+                raise ValidationError(
+                    _("Can only crop photos if both width and height dimensions are set."))
 
     def save(self, *args, **kwargs):
         super(PhotoSize, self).save(*args, **kwargs)
