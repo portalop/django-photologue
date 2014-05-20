@@ -98,7 +98,6 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'photologue',
     'sortedm2m',
-    'south',
     'example_project',
 ]
 
@@ -158,4 +157,4 @@ if len(sys.argv) > 1 and sys.argv[1] == 'test':
     LOGGING['loggers']['']['handlers'] = ['null']
     LOGGING['loggers']['photologue']['handlers'] = ['null']
 
-SOUTH_TESTS_MIGRATE = False
+TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'

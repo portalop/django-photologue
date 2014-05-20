@@ -8,9 +8,15 @@ Upgrade notes:
 
 THIS RELEASE BREAKS BACKWARDS COMPATIBILITY!
 
+Django 1.7s migrations framework means that we are phasing out South support.
+If you're installing Photologue fresh on Django 1.7, then all's good.
+In all other cases, read in the docs the installation instructions about SOUTH_MIGRATION_MODULES.
+
 List of changes:
 
+- Support for Django 1.7's migrations framework.
 - date_taken field not correctly handled during single photo upload (#80).
+
 
 2.8 (2014-05-04)
 ----------------
