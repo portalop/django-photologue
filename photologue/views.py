@@ -1,8 +1,17 @@
+# -*- encoding: utf-8 -*-
+
 from django.conf import settings
 from django.views.generic.dates import ArchiveIndexView, DateDetailView, DayArchiveView, MonthArchiveView, YearArchiveView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-from .models import Photo, Gallery
+from django.views.generic import View
+from .models import Photo, Gallery, PhotoSize, CustomCrop
+import json
+from django.http import HttpResponse
+from django.utils.html import format_html
+from django.utils.encoding import force_text
+from django.contrib import admin
+from django.core.urlresolvers import reverse
 
 # Number of galleries to display per page.
 GALLERY_PAGINATE_BY = getattr(settings, 'PHOTOLOGUE_GALLERY_PAGINATE_BY', 20)
@@ -93,3 +102,18 @@ class PhotoMonthArchiveView(PhotoDateView, MonthArchiveView):
 
 class PhotoYearArchiveView(PhotoDateView, YearArchiveView):
     pass
+
+class ImageLookupView(View):
+    def get(self, *args, **kwargs):
+        options = []
+        custom_crop = reverse(
+            'admin:%s_%s_add'
+            % (CustomCrop._meta.app_label, CustomCrop._meta.model_name), current_app=admin.site.name
+        )
+        for photo in Photo.objects.all().exclude(id__in=self.request.GET["exclude_ids"].split(","))[:15]:
+            options.append(format_html('<option data-img-src="{1}" data-crop-url="{2}" value="{0}">',
+                                        photo.id,
+                                        photo._get_SIZE_url(self.request.GET["image_size"]),
+                                        ''.join([custom_crop, '?photo_id=', str(photo.id), '&photosize_id=', str(PhotoSize.objects.get(name=self.request.GET["image_size"]).id)])) + unicode(photo) + '</option>')
+        resp = {'new_options': ''.join(options),}
+        return HttpResponse(json.dumps(resp), mimetype="application/json" )

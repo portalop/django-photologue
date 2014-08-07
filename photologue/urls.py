@@ -1,11 +1,12 @@
 from django.conf.urls import *
 from django.views.generic import RedirectView
 from django.core.urlresolvers import reverse_lazy
+from django.contrib.auth.decorators import login_required
 
 from .views import PhotoListView, PhotoDetailView, GalleryListView, \
     GalleryDetailView, PhotoArchiveIndexView, PhotoDateDetailView, PhotoDayArchiveView, \
     PhotoYearArchiveView, PhotoMonthArchiveView, GalleryArchiveIndexView, GalleryYearArchiveView, \
-    GalleryDateDetailView, GalleryDayArchiveView, GalleryMonthArchiveView
+    GalleryDateDetailView, GalleryDayArchiveView, GalleryMonthArchiveView, ImageLookupView
 
 
 urlpatterns = patterns('',
@@ -54,6 +55,7 @@ urlpatterns = patterns('',
         PhotoListView.as_view(),
         name='pl-photo-list'),
 
+    url(r'^image-lookup/$',
+        login_required(ImageLookupView.as_view()),
+        name='pl-image-lookup'),
 )
-
-

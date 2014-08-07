@@ -409,6 +409,8 @@ class ImageModel(models.Model):
                                blank=True,
                                related_name="%(class)s_related",
                                verbose_name=_('effect'))
+    crops = models.ManyToManyField('PhotoSize',
+                                   through='CustomCrop')
 
     class Meta:
         abstract = True
@@ -449,7 +451,7 @@ class ImageModel(models.Model):
     def _get_filename_for_size(self, size):
         size = getattr(size, 'name', size)
         base, ext = os.path.splitext(self.image_filename())
-        return ''.join([base, '_', size, ext])
+        return ''.join([self.slug, '-', size, ext])
 
     def _get_SIZE_photosize(self, size):
         return PhotoSizeCache().sizes.get(size)
@@ -500,28 +502,38 @@ class ImageModel(models.Model):
     def resize_image(self, im, photosize):
         cur_width, cur_height = im.size
         new_width, new_height = photosize.size
+        custom_crop = None
+        if CustomCrop.objects.filter(photosize=photosize, photo=self).count() == 1:
+            custom_crop = CustomCrop.objects.get(photosize=photosize, photo=self)
         if photosize.crop:
-            ratio = max(float(new_width) / cur_width, float(new_height) / cur_height)
-            x = (cur_width * ratio)
-            y = (cur_height * ratio)
-            xd = abs(new_width - x)
-            yd = abs(new_height - y)
-            x_diff = int(xd / 2)
-            y_diff = int(yd / 2)
-            if self.crop_from == 'top':
-                box = (int(x_diff), 0, int(x_diff + new_width), new_height)
-            elif self.crop_from == 'left':
-                box = (0, int(y_diff), new_width, int(y_diff + new_height))
-            elif self.crop_from == 'bottom':
-                # y - yd = new_height
-                box = (int(x_diff), int(yd), int(x_diff + new_width), int(y))
-            elif self.crop_from == 'right':
-                # x - xd = new_width
-                box = (int(xd), int(y_diff), int(x), int(y_diff + new_height))
+            if custom_crop is None:
+                ratio = max(float(new_width) / cur_width, float(new_height) / cur_height)
+                x = (cur_width * ratio)
+                y = (cur_height * ratio)
+                xd = abs(new_width - x)
+                yd = abs(new_height - y)
+                x_diff = int(xd / 2)
+                y_diff = int(yd / 2)
+                if self.crop_from == 'top':
+                    box = (int(x_diff), 0, int(x_diff + new_width), new_height)
+                elif self.crop_from == 'left':
+                    box = (0, int(y_diff), new_width, int(y_diff + new_height))
+                elif self.crop_from == 'bottom':
+                    # y - yd = new_height
+                    box = (int(x_diff), int(yd), int(x_diff + new_width), int(y))
+                elif self.crop_from == 'right':
+                    # x - xd = new_width
+                    box = (int(xd), int(y_diff), int(x), int(y_diff + new_height))
+                else:
+                    box = (int(x_diff), int(y_diff), int(x_diff + new_width), int(y_diff + new_height))
+                im = im.resize((int(x), int(y)), Image.ANTIALIAS).crop(box)
             else:
-                box = (int(x_diff), int(y_diff), int(x_diff + new_width), int(y_diff + new_height))
-            im = im.resize((int(x), int(y)), Image.ANTIALIAS).crop(box)
+                box = (custom_crop.x, custom_crop.y, custom_crop.x + custom_crop.width, custom_crop.y + custom_crop.height)
+                im = im.crop(box).resize((new_width, new_height), Image.ANTIALIAS)
         else:
+            if custom_crop is not None:
+                box = (custom_crop.x, custom_crop.y, custom_crop.x + custom_crop.width, custom_crop.y + custom_crop.height)
+                im = im.crop(box)
             if not new_width == 0 and not new_height == 0:
                 ratio = min(float(new_width) / cur_width,
                             float(new_height) / cur_height)
@@ -541,7 +553,8 @@ class ImageModel(models.Model):
 
     def create_size(self, photosize):
         if self.size_exists(photosize):
-            return
+            if CustomCrop.objects.filter(photosize=photosize, photo=self).count() == 0:
+                return
         if not os.path.isdir(self.cache_path()):
             os.makedirs(self.cache_path())
         try:
@@ -968,6 +981,23 @@ class PhotoSize(models.Model):
         self.width, self.height = value
     size = property(_get_size, _set_size)
 
+@python_2_unicode_compatible
+class CustomCrop(models.Model):
+    photo = models.ForeignKey(Photo, blank=False, null=False)
+    photosize = models.ForeignKey(PhotoSize, blank=False, null=False)
+    x = models.PositiveIntegerField(default=0, blank=True, null=False)
+    y = models.PositiveIntegerField(default=0, blank=True, null=False)
+    width = models.PositiveIntegerField(default=110, blank=True, null=False)
+    height = models.PositiveIntegerField(default=110, blank=True, null=False)
+    def __str__(self):
+        return ' | '.join([self.photo.title, self.photosize.name])
+    def save(self, *args, **kwargs):
+        super(CustomCrop, self).save(*args, **kwargs)
+        self.photo.create_size(self.photosize)
+
+    class Meta:
+        verbose_name = _('recorte')
+        verbose_name_plural = _('recortes')
 
 class PhotoSizeCache(object):
     __state = {"sizes": {}}

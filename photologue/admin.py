@@ -1,12 +1,20 @@
 from django import forms
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.admin.options import IS_POPUP_VAR
+from django.contrib.admin.views.main import TO_FIELD_VAR
 from django.contrib.sites.models import Site
 from django.contrib import messages
+from django.template.response import SimpleTemplateResponse
+from django.core.urlresolvers import reverse
+from django.utils.html import escape, escapejs
+from django.utils.encoding import force_text
 from django.utils.translation import ungettext, ugettext_lazy as _
 
 from .models import Gallery, Photo, GalleryUpload, PhotoEffect, PhotoSize, \
-    Watermark
+    Watermark, CustomCrop
+from .forms import CustomCropAdminForm
+import adminwidgetswap
 
 USE_CKEDITOR = getattr(settings, 'PHOTOLOGUE_USE_CKEDITOR', False)
 
@@ -183,7 +191,7 @@ class PhotoAdmin(admin.ModelAdmin):
             kwargs["initial"] = [Site.objects.get_current()]
         return super(PhotoAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
-    def add_photos_to_current_site(modeladmin, request, queryset):
+    def add_photos_to_current_site(self, request, queryset):
         current_site = Site.objects.get_current()
         current_site.photo_set.add(*queryset)
         msg = ungettext(
@@ -196,7 +204,7 @@ class PhotoAdmin(admin.ModelAdmin):
     add_photos_to_current_site.short_description = \
         _("Add selected photos to the current site")
 
-    def remove_photos_from_current_site(modeladmin, request, queryset):
+    def remove_photos_from_current_site(self, request, queryset):
         current_site = Site.objects.get_current()
         current_site.photo_set.remove(*queryset)
         msg = ungettext(
@@ -208,6 +216,33 @@ class PhotoAdmin(admin.ModelAdmin):
 
     remove_photos_from_current_site.short_description = \
         _("Remove selected photos from the current site")
+
+    def response_add(self, request, obj, post_url_continue=None):
+        pk_value = obj._get_pk_val()
+
+        if IS_POPUP_VAR in request.POST:
+            to_field = request.POST.get(TO_FIELD_VAR)
+            if to_field:
+                attr = str(to_field)
+            else:
+                attr = obj._meta.pk.attname
+            value = obj.serializable_value(attr)
+            custom_crop = reverse(
+                'admin:%s_%s_add'
+                % (self.model._meta.app_label, CustomCrop._meta.model_name), current_app=admin.site.name
+            )
+            parametros = {
+                'pk_value': escape(pk_value), # for possible backwards-compatibility
+                'value': escape(value),
+                'obj': escapejs(obj)
+            }
+            if request.GET.get('photosize'):
+                parametros.update({
+                    'photo_url': escape(obj._get_SIZE_url(request.GET.get('photosize'))),
+                    'crop_url': ''.join([custom_crop, '?photo_id=', escape(value), '&photosize_id=', str(PhotoSize.objects.get(name=request.GET.get('photosize')).id)])
+                })
+            return SimpleTemplateResponse('admin/photopicker_popup_response.html', parametros)
+        return super(PhotoAdmin, self).response_add(request, obj, post_url_continue)
 
 
 class PhotoEffectAdmin(admin.ModelAdmin):
@@ -250,6 +285,38 @@ class PhotoSizeAdmin(admin.ModelAdmin):
 class WatermarkAdmin(admin.ModelAdmin):
     list_display = ('name', 'opacity', 'style')
 
+class CustomCropAdmin(admin.ModelAdmin):
+    form = CustomCropAdminForm
+    fields = ('photo', 'photosize', 'x', 'y', 'width', 'height')
+    def save_model(self, request, obj, form, change):
+        if not change:
+            if CustomCrop.objects.filter(photo=obj.photo, photosize=obj.photosize).count() > 0:
+                old_crop = CustomCrop.objects.get(photo=obj.photo, photosize=obj.photosize)
+                old_crop.x = obj.x
+                old_crop.y = obj.y
+                old_crop.width = obj.width
+                old_crop.height = obj.height
+                obj = old_crop
+        obj.save()
+    def get_form(self, request, obj=None, **kwargs):
+        AdminForm = super(CustomCropAdmin, self).get_form(request, obj, **kwargs)
+        class ModelFormMetaClass(AdminForm):
+            def __new__(cls, *args, **kwargs):
+                kwargs['request'] = request
+                return AdminForm(*args, **kwargs)
+        return ModelFormMetaClass
+
+    def response_add(self, request, obj, post_url_continue=None):
+        pk_value = obj._get_pk_val()
+        if IS_POPUP_VAR in request.POST:
+            return SimpleTemplateResponse('admin/photopicker_popup_response.html', {
+                'pk_value': escape(pk_value),  # for possible backwards-compatibility
+                'value': '',
+                'obj': escapejs(obj),
+                'photo_url': escape(obj.photo._get_SIZE_url(obj.photosize.name))
+            })
+        return super(CustomCropAdmin, self).response_add(self, request, obj, post_url_continue)
+
 
 admin.site.register(Gallery, GalleryAdmin)
 admin.site.register(GalleryUpload, GalleryUploadAdmin)
@@ -257,3 +324,6 @@ admin.site.register(Photo, PhotoAdmin)
 admin.site.register(PhotoEffect, PhotoEffectAdmin)
 admin.site.register(PhotoSize, PhotoSizeAdmin)
 admin.site.register(Watermark, WatermarkAdmin)
+admin.site.register(CustomCrop, CustomCropAdmin)
+
+adminwidgetswap.swap_model_field()

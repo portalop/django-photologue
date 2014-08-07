@@ -3,5 +3,6 @@ recursive-include photologue/res *.jpg
 recursive-include photologue/res/zips *.zip
 recursive-include photologue/templates/photologue *.html
 recursive-include photologue/contrib *
+recursive-include photologue/static *
 include requirements.txt
 global-exclude *.pyc
