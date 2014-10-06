@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import ModelForm
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.options import IS_POPUP_VAR
@@ -159,11 +160,20 @@ class GalleryUploadAdmin(admin.ModelAdmin):
 
 
 class PhotoAdminForm(forms.ModelForm):
+    add_to_gallery = forms.ModelChoiceField(queryset=Gallery.objects.all(), required=False, label='Añadir al álbum')
+
     if USE_CKEDITOR:
         caption = forms.CharField(widget=CKEditorWidget())
 
+    def __init__(self, *args, **kwargs):
+        request = self.request
+        super(PhotoAdminForm, self).__init__(*args, **kwargs)
+        if '_add_to_gallery' in request.GET:
+            self.fields['add_to_gallery'].initial = request.GET.get('_add_to_gallery')
+
     class Meta:
         model = Photo
+
         if MULTISITE:
             exclude = []
         else:
@@ -244,6 +254,17 @@ class PhotoAdmin(admin.ModelAdmin):
             return SimpleTemplateResponse('admin/photopicker_popup_response.html', parametros)
         return super(PhotoAdmin, self).response_add(request, obj, post_url_continue)
 
+    def save_model(self, request, obj, form, change):
+        obj.save()
+        gallery_obj = form.cleaned_data.get('add_to_gallery')
+        if gallery_obj:
+            gallery_obj.photos.add(obj)
+            gallery_obj.save()
+
+    def get_form(self, request, obj=None, **kwargs):
+        a = super(PhotoAdmin, self).get_form(request, obj=None, **kwargs)
+        a.request = request
+        return a
 
 class PhotoEffectAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'color', 'brightness',

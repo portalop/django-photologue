@@ -110,7 +110,10 @@ class ImageLookupView(View):
             'admin:%s_%s_add'
             % (CustomCrop._meta.app_label, CustomCrop._meta.model_name), current_app=admin.site.name
         )
-        for photo in Photo.objects.all().exclude(id__in=self.request.GET["exclude_ids"].split(","))[:15]:
+        exclude_ids = self.request.GET["exclude_ids"].split(",")
+        if exclude_ids == ['']:
+            exclude_ids = []
+        for photo in Photo.objects.all().exclude(id__in=exclude_ids)[:15]:
             options.append(format_html('<option data-img-src="{1}" data-crop-url="{2}" value="{0}">',
                                         photo.id,
                                         photo._get_SIZE_url(self.request.GET["image_size"]),
