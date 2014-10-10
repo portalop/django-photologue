@@ -9,22 +9,34 @@ Django-photologue
     :target: https://crate.io/packages/django-photologue/
     :alt: Number of PyPI downloads
 
-.. image:: https://secure.travis-ci.org/jdriscoll/django-photologue.png?branch=master
+.. image:: https://travis-ci.org/jdriscoll/django-photologue.svg?branch=master
+    :target: https://travis-ci.org/jdriscoll/django-photologue
 
 A powerful image management and gallery application for the Django web framework. Upload photos, group them into
 galleries, apply effects such as watermarks.
 
-Examples
---------
+Examples & demo website
+-----------------------
 We have some `examples of sites using Photologue <https://github.com/jdriscoll/django-photologue/wiki/Examples-and-forks>`_ on our wiki.
+
+We also have a `demo website <http://www.django-photologue.net/>`_.
 
 Documentation
 -------------
+
+.. image:: https://readthedocs.org/projects/django-photologue/badge/?version=3.0
+    :target: https://readthedocs.org/projects/django-photologue/
+    :alt: Documentation Status
+
 Please head over to our `online documentation <https://django-photologue.readthedocs.org/>`_ for instructions on installing and configuring this application.
 
 Python 3?
 ---------
 Of course! Photologue is CI tested against both Python 2 and Python 3.
+
+Amazon S3?
+----------
+Yes. Note that you'll have to install Boto, which for now is not compatible with Python 3.
 
 Support
 -------

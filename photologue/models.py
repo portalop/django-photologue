@@ -6,23 +6,24 @@ from inspect import isclass
 import warnings
 import logging
 from io import BytesIO
+try:
+    from importlib import import_module
+except ImportError:
+    # Compatibility with Python 2.6.
+    from django.utils.importlib import import_module
 
+import django
 from django.utils.timezone import now
 from django.db import models
 from django.db.models.signals import post_init, post_save
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
-try:
-    from django.utils.encoding import force_text
-except ImportError:
-    # Django < 1.4.2
-    from django.utils.encoding import force_unicode as force_text
-from django.utils.encoding import smart_str, filepath_to_uri
+from django.utils.encoding import force_text, smart_str, filepath_to_uri
 from django.utils.functional import curry
-from django.utils.importlib import import_module
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import python_2_unicode_compatible
 from django.core.validators import RegexValidator
@@ -67,8 +68,9 @@ except ImportError:
     tagfield_help_text = _('Django-tagging was not found, tags will be treated as plain text.')
 
     # Tell South how to handle this custom field.
-    from south.modelsinspector import add_introspection_rules
-    add_introspection_rules([], ["^photologue\.models\.TagField"])
+    if django.VERSION[:2] < (1, 7):
+        from south.modelsinspector import add_introspection_rules
+        add_introspection_rules([], ["^photologue\.models\.TagField"])
 
 from .utils import EXIF
 from .utils.reflection import add_reflection
@@ -153,6 +155,8 @@ for n in dir(ImageFilter):
 IMAGE_FILTERS_HELP_TEXT = _(
     'Chain multiple filters using the following pattern "FILTER_ONE->FILTER_TWO->FILTER_THREE". Image filters will be applied in order. The following filters are available: %s.' % (', '.join(filter_names)))
 
+size_method_map = {}
+
 
 @python_2_unicode_compatible
 class Gallery(models.Model):
@@ -191,7 +195,7 @@ class Gallery(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse('pl-gallery', args=[self.slug])
+        return reverse('photologue:pl-gallery', args=[self.slug])
 
     def latest(self, limit=LATEST_LIMIT, public=True):
         if not limit:
@@ -248,6 +252,8 @@ class GalleryUpload(models.Model):
                                 upload_to=os.path.join(PHOTOLOGUE_DIR, 'temp'),
                                 help_text=_('Select a .zip file of images to upload into a new Gallery.'))
     title = models.CharField(_('title'),
+                             null=True,
+                             blank=True,
                              max_length=50,
                              help_text=_('All uploaded photos will be given a title made up of this title + a '
                                          'sequential number.'))
@@ -293,9 +299,9 @@ class GalleryUpload(models.Model):
             raise ValidationError(_('Select an existing gallery or enter a new gallery name.'))
 
     def process_zipfile(self):
-        if os.path.isfile(self.zip_file.path):
+        if default_storage.exists(self.zip_file.name):
             # TODO: implement try-except here
-            zip = zipfile.ZipFile(self.zip_file.path)
+            zip = zipfile.ZipFile(default_storage.open(self.zip_file.name))
             bad_file = zip.testzip()
             if bad_file:
                 zip.close()
@@ -306,7 +312,7 @@ class GalleryUpload(models.Model):
                 logger.debug('Using pre-existing gallery.')
                 gallery = self.gallery
             else:
-                logger.debug('Creating new gallery "{0}".'.format(self.title))
+                logger.debug(force_text('Creating new gallery "{0}".').format(self.title))
                 gallery = Gallery.objects.create(title=self.title,
                                                  slug=slugify(self.title),
                                                  description=self.description,
@@ -337,7 +343,7 @@ class GalleryUpload(models.Model):
                     logger.debug('File "{0}" is empty.'.format(filename))
                     continue
 
-                title = ' '.join([self.title, str(count)])
+                title = ' '.join([gallery.title, str(count)])
                 slug = slugify(title)
 
                 try:
@@ -418,10 +424,16 @@ class ImageModel(models.Model):
     @property
     def EXIF(self):
         try:
-            return EXIF.process_file(self.image.file.file)
+            f = self.image.storage.open(self.image.name, 'rb')
+            tags = EXIF.process_file(f)
+            f.close()
+            return tags
         except:
             try:
-                return EXIF.process_file(self.image.file.file, details=False)
+                f = self.image.storage.open(self.image.name, 'rb')
+                tags = EXIF.process_file(f, details=False)
+                f.close()
+                return tags
             except:
                 return {}
 
@@ -440,13 +452,13 @@ class ImageModel(models.Model):
     admin_thumbnail.allow_tags = True
 
     def cache_path(self):
-        return os.path.join(os.path.dirname(self.image.path), "cache")
+        return os.path.join(os.path.dirname(self.image.name), "cache")
 
     def cache_url(self):
         return '/'.join([os.path.dirname(self.image.url), "cache"])
 
     def image_filename(self):
-        return os.path.basename(force_text(self.image.path))
+        return os.path.basename(force_text(self.image.name))
 
     def _get_filename_for_size(self, size):
         size = getattr(size, 'name', size)
@@ -460,7 +472,8 @@ class ImageModel(models.Model):
         photosize = PhotoSizeCache().sizes.get(size)
         if not self.size_exists(photosize):
             self.create_size(photosize)
-        return Image.open(self._get_SIZE_filename(size)).size
+        return Image.open(self.image.storage.open(
+            self._get_SIZE_filename(size))).size
 
     def _get_SIZE_url(self, size):
         photosize = PhotoSizeCache().sizes.get(size)
@@ -481,21 +494,22 @@ class ImageModel(models.Model):
         self.view_count += 1
         models.Model.save(self)
 
-    def add_accessor_methods(self, *args, **kwargs):
-        for size in PhotoSizeCache().sizes.keys():
-            setattr(self, 'get_%s_size' % size,
-                    curry(self._get_SIZE_size, size=size))
-            setattr(self, 'get_%s_photosize' % size,
-                    curry(self._get_SIZE_photosize, size=size))
-            setattr(self, 'get_%s_url' % size,
-                    curry(self._get_SIZE_url, size=size))
-            setattr(self, 'get_%s_filename' % size,
-                    curry(self._get_SIZE_filename, size=size))
+    def __getattr__(self, name):
+        global size_method_map
+        if not size_method_map:
+            init_size_method_map()
+        di = size_method_map.get(name, None)
+        if di is not None:
+            result = curry(getattr(self, di['base_name']), di['size'])
+            setattr(self, name, result)
+            return result
+        else:
+            raise AttributeError
 
     def size_exists(self, photosize):
         func = getattr(self, "get_%s_filename" % photosize.name, None)
         if func is not None:
-            if os.path.isfile(func()):
+            if self.image.storage.exists(func()):
                 return True
         return False
 
@@ -557,8 +571,9 @@ class ImageModel(models.Model):
                 return
         if not os.path.isdir(self.cache_path()):
             os.makedirs(self.cache_path())
+            return
         try:
-            im = Image.open(self.image.path)
+            im = Image.open(self.image.storage.open(self.image.name))
         except IOError:
             return
         # Save the original format
@@ -582,44 +597,36 @@ class ImageModel(models.Model):
         # Save file
         im_filename = getattr(self, "get_%s_filename" % photosize.name)()
         try:
+            buffer = BytesIO()
             if im_format != 'JPEG':
-                try:
-                    im.save(im_filename)
-                    return
-                except KeyError:
-                    pass
-            im.save(im_filename, 'JPEG', quality=int(photosize.quality), optimize=True)
+                im.save(buffer, im_format)
+            else:
+                im.save(buffer, 'JPEG', quality=int(photosize.quality),
+                        optimize=True)
+            buffer_contents = ContentFile(buffer.getvalue())
+            self.image.storage.save(im_filename, buffer_contents)
         except IOError as e:
-            if os.path.isfile(im_filename):
-                os.unlink(im_filename)
+            if self.image.storage.exists(im_filename):
+                self.image.storage.delete(im_filename)
             raise e
 
     def remove_size(self, photosize, remove_dirs=True):
         if not self.size_exists(photosize):
             return
         filename = getattr(self, "get_%s_filename" % photosize.name)()
-        if os.path.isfile(filename):
-            os.remove(filename)
-        if remove_dirs:
-            self.remove_cache_dirs()
+        if self.image.storage.exists(filename):
+            self.image.storage.delete(filename)
 
     def clear_cache(self):
         cache = PhotoSizeCache()
         for photosize in cache.sizes.values():
             self.remove_size(photosize, False)
-        self.remove_cache_dirs()
 
     def pre_cache(self):
         cache = PhotoSizeCache()
         for photosize in cache.sizes.values():
             if photosize.pre_cache:
                 self.create_size(photosize)
-
-    def remove_cache_dirs(self):
-        try:
-            os.removedirs(self.cache_path())
-        except:
-            pass
 
     def save(self, *args, **kwargs):
         if self.date_taken is None:
@@ -649,9 +656,8 @@ class ImageModel(models.Model):
         # http://haineault.com/blog/147/
         # The data loss scenarios mentioned in the docs hopefully do not apply
         # to Photologue!
-        path = self.image.path
         super(ImageModel, self).delete()
-        os.remove(path)
+        self.image.storage.delete(self.image.name)
 
 
 @python_2_unicode_compatible
@@ -690,7 +696,7 @@ class Photo(ImageModel):
         super(Photo, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('pl-photo', args=[self.slug])
+        return reverse('photologue:pl-photo', args=[self.slug])
 
     def public_galleries(self):
         """Return the public galleries to which this photo belongs."""
@@ -747,7 +753,7 @@ class BaseEffect(models.Model):
         abstract = True
 
     def sample_dir(self):
-        return os.path.join(settings.MEDIA_ROOT, PHOTOLOGUE_DIR, 'samples')
+        return os.path.join(PHOTOLOGUE_DIR, 'samples')
 
     def sample_url(self):
         return settings.MEDIA_URL + '/'.join([PHOTOLOGUE_DIR, 'samples', '%s %s.jpg' % (self.name.lower(), 'sample')])
@@ -756,15 +762,16 @@ class BaseEffect(models.Model):
         return os.path.join(self.sample_dir(), '%s %s.jpg' % (self.name.lower(), 'sample'))
 
     def create_sample(self):
-        if not os.path.isdir(self.sample_dir()):
-            os.makedirs(self.sample_dir())
         try:
             im = Image.open(SAMPLE_IMAGE_PATH)
         except IOError:
             raise IOError(
                 'Photologue was unable to open the sample image: %s.' % SAMPLE_IMAGE_PATH)
         im = self.process(im)
-        im.save(self.sample_filename(), 'JPEG', quality=90, optimize=True)
+        buffer = BytesIO()
+        im.save(buffer, 'JPEG', quality=90, optimize=True)
+        buffer_contents = ContentFile(buffer.getvalue())
+        default_storage.save(self.sample_filename(), buffer_contents)
 
     def admin_sample(self):
         return u'<img src="%s">' % self.sample_url()
@@ -787,7 +794,7 @@ class BaseEffect(models.Model):
 
     def save(self, *args, **kwargs):
         try:
-            os.remove(self.sample_filename())
+            default_storage.delete(self.sample_filename())
         except:
             pass
         models.Model.save(self, *args, **kwargs)
@@ -802,7 +809,7 @@ class BaseEffect(models.Model):
 
     def delete(self):
         try:
-            os.remove(self.sample_filename())
+            default_storage.delete(self.sample_filename())
         except:
             pass
         models.Model.delete(self)
@@ -887,8 +894,14 @@ class Watermark(BaseEffect):
         verbose_name = _('watermark')
         verbose_name_plural = _('watermarks')
 
+    def delete(self):
+        assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (
+            self._meta.object_name, self._meta.pk.attname)
+        super(Watermark, self).delete()
+        self.image.storage.delete(self.image.name)
+
     def post_process(self, im):
-        mark = Image.open(self.image.path)
+        mark = Image.open(self.image.storage.open(self.image.name))
         return apply_watermark(im, mark, self.style, self.opacity)
 
 
@@ -1010,19 +1023,22 @@ class PhotoSizeCache(object):
                 self.sizes[size.name] = size
 
     def reset(self):
+        global size_method_map
+        size_method_map = {}
         self.sizes = {}
 
 
-# Set up the accessor methods
-def add_methods(sender, instance, signal, *args, **kwargs):
-    """ Adds methods to access sized images (urls, paths)
-
-    after the Photo model's __init__ function completes,
-    this method calls "add_accessor_methods" on each instance.
-    """
-    if hasattr(instance, 'add_accessor_methods'):
-        instance.add_accessor_methods()
-post_init.connect(add_methods)
+def init_size_method_map():
+    global size_method_map
+    for size in PhotoSizeCache().sizes.keys():
+        size_method_map['get_%s_size' % size] = \
+            {'base_name': '_get_SIZE_size', 'size': size}
+        size_method_map['get_%s_photosize' % size] = \
+            {'base_name': '_get_SIZE_photosize', 'size': size}
+        size_method_map['get_%s_url' % size] = \
+            {'base_name': '_get_SIZE_url', 'size': size}
+        size_method_map['get_%s_filename' % size] = \
+            {'base_name': '_get_SIZE_filename', 'size': size}
 
 
 def add_default_site(instance, created, **kwargs):

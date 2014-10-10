@@ -4,20 +4,25 @@ Justin Driscoll
 Richard Barran
 Marcos Daniel Petry
 Jannis
+Celia Oakley
 Jonas Haag
 Karol Majta
 Jakub Dorňák
 Andrew Gerard
+Alexey Vasilyev
 kdeebee
 Benjamin Liles
 FilippoIOVINE
 ferhat elmas
-Juraj Bubniak
+Thomas Güttler
 Federico Maggi
 Herman Schaaf
 Vivek Agarwal
+Tomas Babej
 Antti Kaihola
-jscott1971
-Ben Spaulding
-QB
 Reavis Sutphin-Gray
+jscott1971
+Martin Sabo
+Ben Spaulding
+python-consulting
+dmalisani

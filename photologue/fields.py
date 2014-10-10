@@ -2,9 +2,9 @@ from django.db import models
 from django import forms
 from photologue.models import Photo
 from widgets import PhotoWidget
-from south.modelsinspector import add_introspection_rules
+#from south.modelsinspector import add_introspection_rules
 
-add_introspection_rules([], ["^photologue\.fields\.PhotoField"])
+#add_introspection_rules([], ["^photologue\.fields\.PhotoField"])
 
 class PhotoFormField(forms.ModelChoiceField):
     def __init__(self, *args, **kwargs):
