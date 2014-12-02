@@ -1,6 +1,10 @@
 from django import forms
-from .models import CustomCrop, Photo, PhotoSize
+from .models import CustomCrop, Photo, PhotoSize, Gallery
 from .widgets import CustomCropWidget
+from django.conf import settings
+
+MULTISITE = getattr(settings, 'PHOTOLOGUE_MULTISITE', False)
+ENABLE_TAGS = getattr(settings, 'PHOTOLOGUE_ENABLE_TAGS', False)
 
 class CustomCropAdminForm(forms.ModelForm):
     photo = forms.ModelChoiceField(queryset=Photo.objects.all(), required=False)
@@ -37,3 +41,23 @@ class CustomCropAdminForm(forms.ModelForm):
 
     class Meta:
         model = CustomCrop
+
+
+class PhotoAdminForm(forms.ModelForm):
+    add_to_gallery = forms.ModelChoiceField(queryset=Gallery.objects.all(), required=False, label='Añadir al álbum')
+
+    def __init__(self, *args, **kwargs):
+        request = self.request
+        super(PhotoAdminForm, self).__init__(*args, **kwargs)
+        if '_add_to_gallery' in request.GET:
+            self.fields['add_to_gallery'].initial = request.GET.get('_add_to_gallery')
+
+    class Meta:
+        model = Photo
+
+        if MULTISITE:
+            exclude = []
+        else:
+            exclude = ['sites']
+        if not ENABLE_TAGS:
+            exclude.append('tags')

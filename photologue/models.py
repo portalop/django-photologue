@@ -110,6 +110,7 @@ if PHOTOLOGUE_PATH is not None:
         get_storage_path = getattr(module, parts[-1])
 else:
     def get_storage_path(instance, filename):
+     #   raise Exception(os.path.join(PHOTOLOGUE_DIR, 'photos', filename))
         return os.path.join(PHOTOLOGUE_DIR, 'photos', filename)
 
 # Quality options for JPEG images
@@ -443,10 +444,10 @@ class ImageModel(models.Model):
             return _('An "admin_thumbnail" photo size has not been defined.')
         else:
             if hasattr(self, 'get_absolute_url'):
-                return u'<a href="%s"><img src="%s"></a>' % \
-                    (self.get_absolute_url(), func())
+                return u'<a href="%s"><img src="%s?%s"></a>' % \
+                    (self.get_absolute_url(), func(), datetime.now().time().microsecond)
             else:
-                return u'<a href="%s"><img src="%s"></a>' % \
+                return u'<a href="%s"><img src="%s?%s"></a>' % \
                     (self.image.url, func())
     admin_thumbnail.short_description = _('Thumbnail')
     admin_thumbnail.allow_tags = True
@@ -520,6 +521,10 @@ class ImageModel(models.Model):
         if CustomCrop.objects.filter(photosize=photosize, photo=self).count() == 1:
             custom_crop = CustomCrop.objects.get(photosize=photosize, photo=self)
         if photosize.crop:
+            if new_width > cur_width or \
+               new_height > cur_height:
+                if not photosize.upscale:
+                    return im
             if custom_crop is None:
                 ratio = max(float(new_width) / cur_width, float(new_height) / cur_height)
                 x = (cur_width * ratio)
@@ -569,8 +574,8 @@ class ImageModel(models.Model):
         if self.size_exists(photosize):
             if CustomCrop.objects.filter(photosize=photosize, photo=self).count() == 0:
                 return
-        if not os.path.isdir(self.cache_path()):
-            os.makedirs(self.cache_path())
+        if not os.path.isdir(self.image.storage.path(self.cache_path())):
+            os.makedirs(self.image.storage.path(self.cache_path()))
             return
         try:
             im = Image.open(self.image.storage.open(self.image.name))
@@ -604,6 +609,8 @@ class ImageModel(models.Model):
                 im.save(buffer, 'JPEG', quality=int(photosize.quality),
                         optimize=True)
             buffer_contents = ContentFile(buffer.getvalue())
+            if self.image.storage.exists(im_filename):
+                self.image.storage.delete(im_filename)
             self.image.storage.save(im_filename, buffer_contents)
         except IOError as e:
             if self.image.storage.exists(im_filename):

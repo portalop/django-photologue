@@ -14,7 +14,7 @@ from django.utils.translation import ungettext, ugettext_lazy as _
 
 from .models import Gallery, Photo, GalleryUpload, PhotoEffect, PhotoSize, \
     Watermark, CustomCrop
-from .forms import CustomCropAdminForm
+from .forms import CustomCropAdminForm, PhotoAdminForm
 import adminwidgetswap
 
 MULTISITE = getattr(settings, 'PHOTOLOGUE_MULTISITE', False)
@@ -151,26 +151,6 @@ class GalleryUploadAdmin(admin.ModelAdmin):
         obj.save()
 
 admin.site.register(GalleryUpload, GalleryUploadAdmin)
-
-
-class PhotoAdminForm(forms.ModelForm):
-    add_to_gallery = forms.ModelChoiceField(queryset=Gallery.objects.all(), required=False, label='Añadir al álbum')
-
-    def __init__(self, *args, **kwargs):
-        request = self.request
-        super(PhotoAdminForm, self).__init__(*args, **kwargs)
-        if '_add_to_gallery' in request.GET:
-            self.fields['add_to_gallery'].initial = request.GET.get('_add_to_gallery')
-
-    class Meta:
-        model = Photo
-
-        if MULTISITE:
-            exclude = []
-        else:
-            exclude = ['sites']
-        if not ENABLE_TAGS:
-            exclude.append('tags')
 
 
 class PhotoAdmin(admin.ModelAdmin):

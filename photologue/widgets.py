@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import copy
 from itertools import chain
+from datetime import datetime
 
 from django import forms
 from django.contrib import admin
@@ -43,7 +44,7 @@ class PhotoWidget(forms.Widget):
         info = (model._meta.app_label, model._meta.object_name.lower())
         photo_object = None
         photo_url = ''
-        if value != None and value not in self.choices:
+        if value and value not in self.choices:
             photo_object = Photo.objects.get(id=value)
             choices = ((value, photo_object),)
             photo_url = photo_object._get_SIZE_url(self.image_size)
@@ -53,9 +54,9 @@ class PhotoWidget(forms.Widget):
             'admin:%s_%s_add'
             % info, current_app=admin.site.name
         )
-        output = [format_html('<div class="image_picker_wrapper"><p class="links"><img src="{5}" class="selected_image" /><a id="add_{0}" href="{1}?photosize={2}" onclick="return showAddAnotherPopup(this);">{3}</a> <a href="#" onclick="return toggleImagePicker(\'{0}\');">{4}</a></p>',
-                              id, add_image_link, self.image_size, '+ Añadir imagen nueva', 'Elegir una imagen ya subida', photo_url)]
-        output.append(format_html('<select data-id="{1}" data-image-size="{2}" data-lookup-path="{3}"{0}>', flatatt(self.build_attrs(attrs, name=name, id=id)), id, self.image_size, reverse('pl-image-lookup')))
+        output = [format_html('<div class="image_picker_wrapper"><p class="links"><img src="{5}?{6}" class="selected_image" /><a id="add_{0}" href="{1}?photosize={2}" onclick="return showAddAnotherPopup(this);">{3}</a> <a href="#" onclick="return toggleImagePicker(\'{0}\');">{4}</a></p>',
+                              id, add_image_link, self.image_size, '+ Añadir imagen nueva', 'Elegir una imagen ya subida', photo_url, datetime.now().time().microsecond)]
+        output.append(format_html('<select data-id="{1}" data-image-size="{2}" data-lookup-path="{3}"{0}>', flatatt(self.build_attrs(attrs, name=name, id=id)), id, self.image_size, reverse('photologue:pl-image-lookup')))
         options = self.render_options(choices, [value])
         if options:
             output.append(options)

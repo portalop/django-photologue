@@ -138,7 +138,7 @@ class ImageLookupView(View):
                                         photo._get_SIZE_url(self.request.GET["image_size"]),
                                         ''.join([custom_crop, '?photo_id=', str(photo.id), '&photosize_id=', str(PhotoSize.objects.get(name=self.request.GET["image_size"]).id)])) + unicode(photo) + '</option>')
         resp = {'new_options': ''.join(options),}
-        return HttpResponse(json.dumps(resp), mimetype="application/json" )
+        return HttpResponse(json.dumps(resp), content_type="application/json" )
     make_object_list = True
 
 

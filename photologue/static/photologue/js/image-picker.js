@@ -67,6 +67,7 @@
         if (getFileNameFromUrl(this.src) == getFileNameFromUrl(photo_url))
           this.src = photo_url + "?" + new Date().getTime();
     });
+    //alert(newId);
     if (newId != '')
     {
         var $sel = $("#" + name);
@@ -78,8 +79,9 @@
             }
         });
         $sel.imagepicker($sel.data("picker").opts);
-        $sel.parent().find("img.selected_image").attr("src", photo_url);
     }
+        //$sel.val(newId);
+        $sel.parent().find("img.selected_image").attr("src", photo_url + "?" + new Date().getTime());
   }
 
   sanitized_options = function(opts) {
@@ -142,7 +144,7 @@
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             option = _ref[_i];
             if (option.selected)
-                _this.select.parent().find("img.selected_image").attr("src", $(option).data("img-src"));
+                _this.select.parent().find("img.selected_image").attr("src", $(option).data("img-src") + "?" + new Date().getTime());
         }*/
         return _this.sync_picker_with_select();
       });
@@ -259,7 +261,7 @@
           this.select.parent().find("img.selected_image").attr("src", "");
         } else {
           this.select.val(selected_value);
-          this.select.parent().find("img.selected_image").attr("src", imagepicker_option.option.data("img-src"));
+          this.select.parent().find("img.selected_image").attr("src", imagepicker_option.option.data("img-src") + "?" + new Date().getTime());
         }
       }
       if (!both_array_are_equal(old_values, this.selected_values())) {
