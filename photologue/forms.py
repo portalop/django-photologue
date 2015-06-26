@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django import forms
 from .models import CustomCrop, Photo, PhotoSize, Gallery
 from .widgets import CustomCropWidget
@@ -47,10 +48,13 @@ class PhotoAdminForm(forms.ModelForm):
     add_to_gallery = forms.ModelChoiceField(queryset=Gallery.objects.all(), required=False, label='Añadir al álbum')
 
     def __init__(self, *args, **kwargs):
-        request = self.request
-        super(PhotoAdminForm, self).__init__(*args, **kwargs)
-        if '_add_to_gallery' in request.GET:
-            self.fields['add_to_gallery'].initial = request.GET.get('_add_to_gallery')
+        if hasattr(self, 'request'):
+            request = self.request
+            super(PhotoAdminForm, self).__init__(*args, **kwargs)
+            if '_add_to_gallery' in request.GET:
+                self.fields['add_to_gallery'].initial = request.GET.get('_add_to_gallery')
+        else:
+            super(PhotoAdminForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Photo
