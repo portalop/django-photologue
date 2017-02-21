@@ -133,11 +133,11 @@ class ImageLookupView(View):
         if exclude_ids == ['']:
             exclude_ids = []
         queryset = Photo.objects.all().exclude(id__in=exclude_ids)
-        album_id = None
+        gallery_id = None
         try:
-          album_id = int(self.request.GET["album_id"])
-          if album_id:
-            queryset = queryset.filter(galleries=album_id)
+          gallery_id = int(self.request.GET["gallery_id"])
+          if gallery_id:
+            queryset = queryset.filter(galleries=gallery_id)
         except:
           pass
         for photo in queryset[:15]:

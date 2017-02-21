@@ -48,8 +48,9 @@
     });
     $.ajax({
       url: $sel.data("lookup-path"),
-      data: {"exclude_ids": exclude_ids.join(','), "image_size": $sel.data("image-size"), "image_size": $sel.data("gallery-id")},
+      data: {"exclude_ids": exclude_ids.join(','), "image_size": $sel.data("image-size"), "gallery_id": $sel.data("gallery-id")},
       success: function(data) {
+        $sel.empty();
         $sel.append(data.new_options);
         $sel.imagepicker($sel.data("picker").opts);
         $sel.data("picker").picker.show();
