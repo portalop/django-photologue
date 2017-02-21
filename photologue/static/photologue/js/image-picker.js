@@ -37,8 +37,10 @@
     return(fileName);
   }
 
-  load_images = function(id) {
+  load_images = function(id, gallery_id) {
     var $sel = $("#" + id);
+    if (gallery_id)
+      $sel.data('gallery-id', gallery_id);
     exclude_ids = [];
     $("#" + id + " option").each(function() {
       if (this.value != '')
@@ -46,7 +48,7 @@
     });
     $.ajax({
       url: $sel.data("lookup-path"),
-      data: {"exclude_ids": exclude_ids.join(','), "image_size": $sel.data("image-size")},
+      data: {"exclude_ids": exclude_ids.join(','), "image_size": $sel.data("image-size"), "image_size": $sel.data("gallery-id")},
       success: function(data) {
         $sel.append(data.new_options);
         $sel.imagepicker($sel.data("picker").opts);
@@ -359,7 +361,6 @@
       this.node.append(crop_link);
       return this.node;
     };
-
     return ImagePickerOption;
 
   })();

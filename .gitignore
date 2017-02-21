@@ -4,3 +4,4 @@ django_photologue.egg-info
 build
 .idea
 dist
+*.sublime-*

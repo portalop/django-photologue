@@ -21,7 +21,7 @@ The new style will coexist with the existing 'pl-' prefix for a couple of releas
 """
 
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^gallery/(?P<year>\d{4})/(?P<month>[0-9]{2})/(?P<day>\w{1,2})/(?P<slug>[\-\d\w]+)/$',
         GalleryDateDetailView.as_view(month_format='%m'),
         name='gallery-detail'),
@@ -101,4 +101,4 @@ urlpatterns = patterns('',
     url(r'^image-lookup/$',
         login_required(ImageLookupView.as_view()),
         name='pl-image-lookup'),
-)
+]

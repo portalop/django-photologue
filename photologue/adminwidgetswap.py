@@ -1,16 +1,20 @@
 import copy
 from django.contrib import admin
 from django.db import models
-from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
+from django.contrib.admin.widgets import RelatedFieldWidgetWrapper as adminRelatedFieldWidgetWrapper
+#from xadmin.plugins.quickform import RelatedFieldWidgetWrapper as xadminRelatedFieldWidgetWrapper
 from .fields import PhotoField
-import xadmin
-from xadmin.sites import site as xadmin_site
+try:
+    import xadmin
+    from xadmin.sites import site as xadmin_site
+except:
+    pass
 
 # autodiscover the admin, very important
 admin.autodiscover()
 #xadmin.autodiscover()
 
-def __get_model_formfield_for_dbfield(model):
+def __get_model_formfield_for_dbfield(model, request):
     """
     Gets the new formfield_for_dbfield_function for a model
     """
@@ -28,7 +32,7 @@ def __get_model_formfield_for_dbfield(model):
 
             If kwargs are given, they're passed to the form Field's constructor.
         """
-        request = kwargs.pop("request", None)
+        #request = kwargs.pop("request", None)
 
         # If the field specifies choices, we don't need to look for special
         # admin widgets - we just need to use a select widget of some kind.
@@ -41,15 +45,16 @@ def __get_model_formfield_for_dbfield(model):
             # Make sure the passed in **kwargs override anything in
             # formfield_overrides because **kwargs is more specific, and should
             # always win.
-            if hasattr(model_admin, 'formfield_overrides') and db_field.__class__ in model_admin.formfield_overrides:
-                kwargs = dict(model_admin.formfield_overrides[db_field.__class__], **kwargs)
+            if db_field.__class__ in self.formfield_overrides:
+                kwargs = dict(self.formfield_overrides[db_field.__class__], **kwargs)
 
             # Get the correct formfield.
-            # if isinstance(db_field, models.ForeignKey) and hasattr(model_admin, 'formfield_for_foreignkey'):
-            #     formfield = model_admin.formfield_for_foreignkey(db_field, request, **kwargs)
-            # elif isinstance(db_field, models.ManyToManyField) and  hasattr(model_admin, 'formfield_for_manytomany'):
-            #     formfield = model_admin.formfield_for_manytomany(db_field, request, **kwargs)
-            formfield = db_field.formfield(**kwargs)
+            if isinstance(db_field, models.ForeignKey) and hasattr(model_admin, 'formfield_for_foreignkey'):
+                formfield = model_admin.formfield_for_foreignkey(db_field, request, **kwargs)
+            elif isinstance(db_field, models.ManyToManyField) and  hasattr(model_admin, 'formfield_for_manytomany'):
+                formfield = model_admin.formfield_for_manytomany(db_field, request, **kwargs)
+            else:
+                formfield = db_field.formfield(**kwargs)
 
             # For non-raw_id fields, wrap the widget with a wrapper that adds
             # extra HTML -- the "add other" interface -- to the end of the
@@ -59,13 +64,20 @@ def __get_model_formfield_for_dbfield(model):
                 pass
             elif formfield and (not (hasattr(model_admin, 'raw_id_fields') and db_field.name in model_admin.raw_id_fields)):
                 related_modeladmin = admin_site._registry.get(db_field.rel.to)
-                can_add_related = True # bool(related_modeladmin and
-                    #request.user.has_perm('%s.%s_%s' % (db_field.rel.to._meta.app_label, 'add', db_field.rel.to._meta.module_name)))
-                   # related_modeladmin.admin_view.has_model_perm(db_field.rel.to, 'add'))
-                formfield.widget.admin_site = admin_site
-                formfield.widget = RelatedFieldWidgetWrapper(
-                    formfield.widget, db_field.rel, admin_site,
-                    can_add_related=can_add_related)
+                wrapper_kwargs = {}
+                if related_modeladmin:
+                    wrapper_kwargs.update(
+                        #can_add_related=request.user.has_perm("%s.add_%s" % (related_modeladmin._meta.app_label, related_modeladmin._meta.name)),
+                        can_add_related=related_modeladmin.has_add_permission(request),
+                        can_change_related=related_modeladmin.has_change_permission(request),
+                        can_delete_related=related_modeladmin.has_delete_permission(request),
+                    )
+                    #if db_field.rel.to in admin.site._registry:
+                formfield.widget = adminRelatedFieldWidgetWrapper(
+                    formfield.widget, db_field.remote_field, self.admin_site, **wrapper_kwargs)
+                    #else:
+                    #    formfield.widget = xadminRelatedFieldWidgetWrapper(
+                    #        formfield.widget, db_field.remote_field, self.admin_site, **wrapper_kwargs)
 
             return formfield
 
@@ -92,14 +104,15 @@ def __get_inline_formfield_for_dbfield(inline, field, widget):
         return old_formfield_for_dbfield(db_field, **kwargs)
     return formfield_for_dbfield
 
-def swap_model_field():
+def swap_model_field(request, model):
     """
     Swaps an admin model field widget (not the inlines where the model is used)
     """
-    for model in admin.site._registry:
-        admin.site._registry[model].formfield_for_dbfield = __get_model_formfield_for_dbfield(model)
-    for model in xadmin_site._registry:
-        xadmin_site._registry[model].formfield_for_dbfield = __get_model_formfield_for_dbfield(model)
+    if model in admin.site._registry:
+        admin.site._registry[model].formfield_for_dbfield = __get_model_formfield_for_dbfield(model, request)
+    if xadmin_site:
+        if model in xadmin_site._registry:
+            xadmin_site._registry[model].formfield_for_dbfield = __get_model_formfield_for_dbfield(model, request)
  #       for registered_model in admin.site._registry:
  #           if admin.site._registry.has_key(registered_model):
  #               for inline in admin.site._registry[registered_model].inlines:
