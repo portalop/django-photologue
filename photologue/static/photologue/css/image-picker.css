@@ -51,3 +51,7 @@ div.image_picker_wrapper p.links a {
   -o-border-radius:3px;
   border-radius:3px
 }
+
+div.image_picker_wrapper div.menu a.active {
+  border:1px solid Red;
+}

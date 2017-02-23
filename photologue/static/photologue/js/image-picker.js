@@ -37,20 +37,50 @@
     return(fileName);
   }
 
-  load_images = function(id, gallery_id) {
+  load_images = function(id, set_property, value) {
     var $sel = $("#" + id);
-    if (gallery_id)
-      $sel.data('gallery-id', gallery_id);
+    $sel.data('page', 1);
+    if (set_property) {
+      $sel.data(set_property, value);
+      switch (set_property) {
+        case 'gallery':
+          $('#gallery_' + id + ' a.active').removeClass('active');
+          $('#gallery_' + id + '_' + value).addClass('active');
+          break;
+        case 'use-admin-thumbnail':
+          $('#use_admin_thumbnail_' + id + ' a.active').removeClass('active');
+          $('#use_admin_thumbnail_' + id + '_' + value).addClass('active');
+          break;
+        case 'page':
+          $('#page_' + id + ' a.active').removeClass('active');
+          $('#page_' + id + '_' + value).addClass('active');
+          break;
+      }
+    }
+
+    /*
     exclude_ids = [];
     $("#" + id + " option").each(function() {
       if (this.value != '')
         exclude_ids.push(this.value);
     });
+    */
     $.ajax({
       url: $sel.data("lookup-path"),
-      data: {"exclude_ids": exclude_ids.join(','), "image_size": $sel.data("image-size"), "gallery_id": $sel.data("gallery-id")},
+      data: {
+        //"exclude_ids": exclude_ids.join(','), 
+        "image_size": $sel.data("use-admin-thumbnail")?'admin_thumbnail':$sel.data("image-size"), 
+        "gallery_id": $sel.data("gallery"), 
+        "page": $sel.data("page")
+      },
       success: function(data) {
         menu = $sel.data("picker").picker.find('li.menu').detach();
+        pages = menu.find('.pages')
+        pages.empty();
+        pages.append('Páginas: ');
+        for (var i = 0; i < data.pages.length; i++)
+          pages.append('<a id="page_' + id + '_' + data.pages[i] + '" href="#' + id + '" onclick="return load_images(\'' + id + '\', \'page\', ' + data.pages[i] + ')"' + (($sel.data("page")==data.pages[i])?' class="active"':'') + '>' + data.pages[i] + '</a>');
+
         $sel.empty();
         $sel.append(data.new_options);
         $sel.imagepicker($sel.data("picker").opts);
@@ -181,7 +211,7 @@
       this.picker = jQuery("<ul class='thumbnails image_picker_selector'><li class='menu'></li></ul>");
       this.picker_options = [];
       this.recursively_parse_option_groups(this.select, this.picker);
-      this.picker.append('<li><a name="load_' + this.select.attr('id') + '" /><a href="#load_' + this.select.attr('id') + '" onclick="return load_images(\'' + this.select.attr('id') + '\');">Cargar más imágenes...</a></li>');
+      //this.picker.append('<li><a name="load_' + this.select.attr('id') + '" /><a href="#load_' + this.select.attr('id') + '" onclick="return load_images(\'' + this.select.attr('id') + '\');">Cargar más imágenes...</a></li>');
       return this.picker;
     };
 
