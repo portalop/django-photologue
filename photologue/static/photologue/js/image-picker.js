@@ -50,9 +50,11 @@
       url: $sel.data("lookup-path"),
       data: {"exclude_ids": exclude_ids.join(','), "image_size": $sel.data("image-size"), "gallery_id": $sel.data("gallery-id")},
       success: function(data) {
+        menu = $sel.data("picker").picker.find('li.menu').detach();
         $sel.empty();
         $sel.append(data.new_options);
         $sel.imagepicker($sel.data("picker").opts);
+        $sel.data("picker").picker.prepend(menu);
         $sel.data("picker").picker.show();
       },
       failure: function(data) {
@@ -122,6 +124,7 @@
         this.opts.limit = parseInt(this.select.data("limit"));
       }
       this.build_and_append_picker();
+      this.picker.next('div.menu').detach().appendTo(this.picker.children('li.menu'));
     }
 
     ImagePicker.prototype.destroy = function() {
@@ -175,7 +178,7 @@
     };
 
     ImagePicker.prototype.create_picker = function() {
-      this.picker = jQuery("<ul class='thumbnails image_picker_selector'></ul>");
+      this.picker = jQuery("<ul class='thumbnails image_picker_selector'><li class='menu'></li></ul>");
       this.picker_options = [];
       this.recursively_parse_option_groups(this.select, this.picker);
       this.picker.append('<li><a name="load_' + this.select.attr('id') + '" /><a href="#load_' + this.select.attr('id') + '" onclick="return load_images(\'' + this.select.attr('id') + '\');">Cargar más imágenes...</a></li>');

@@ -72,13 +72,13 @@ class PhotoWidget(forms.Widget):
         options = self.render_options(choices, [value])
         if options:
             output.append(options)
-        output.append('</select></div>')
+        output.append('</select>')
 
-        output.append('<p>Elegir una imagen de un álbum:</p>')
+        output.append('<div class="menu"><p>Elegir una imagen de un álbum:</p>')
         output.append('<a href="#load_' + id + '" onclick="return load_images(\'' + id + '\', -1);">Sin clasificar</a> ')
         for album in Gallery.objects.all():
-            output.append('<a href="#load_' + id + '" onclick="return load_images(\'' + id + '\', %s);">%s</a> ' % (album.id, album.title))
-        output.append('<script type="text/javascript">$("#id_' + name + '").imagepicker({show_label:true});</script>')
+            output.append('<a href="#load_' + id + '" onclick="return load_images(\'' + id + '\', %s);">%s</a>' % (album.id, album.title))
+        output.append('</div></div><script type="text/javascript">$("#id_' + name + '").imagepicker({show_label:true});</script>')
         return mark_safe(''.join(output))
 
     def render_option(self, selected_choices, option_value, option_label):
