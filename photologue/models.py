@@ -11,6 +11,7 @@ try:
 except ImportError:
     # Compatibility with Python 2.6.
     from django.utils.importlib import import_module
+import exifread
 
 import django
 from django.utils.timezone import now
@@ -48,7 +49,7 @@ except ImportError:
             'Photologue was unable to import the Python Imaging Library. Please confirm it`s installed and available on your current Python path.')
 
 from sortedm2m.fields import SortedManyToManyField
-from model_utils.managers import PassThroughManager
+#from model_utils.managers import PassThroughManager
 
 # attempt to load the django-tagging TagField from default location,
 # otherwise we substitude a dummy TagField.
@@ -72,7 +73,6 @@ except ImportError:
         from south.modelsinspector import add_introspection_rules
         add_introspection_rules([], ["^photologue\.models\.TagField"])
 
-from .utils import EXIF
 from .utils.reflection import add_reflection
 from .utils.watermark import apply_watermark
 from .managers import GalleryQuerySet, PhotoQuerySet
@@ -112,6 +112,15 @@ else:
     def get_storage_path(instance, filename):
      #   raise Exception(os.path.join(PHOTOLOGUE_DIR, 'photos', filename))
         return os.path.join(PHOTOLOGUE_DIR, 'photos', filename)
+
+# Image Orientations (according to EXIF informations) that needs to be
+# transposed and appropriate action
+IMAGE_EXIF_ORIENTATION_MAP = {
+    2: Image.FLIP_LEFT_RIGHT,
+    3: Image.ROTATE_180,
+    6: Image.ROTATE_270,
+    8: Image.ROTATE_90,
+}
 
 # Quality options for JPEG images
 JPEG_QUALITY_CHOICES = (
@@ -184,7 +193,8 @@ class Gallery(models.Model):
     sites = models.ManyToManyField(Site, verbose_name=_(u'sites'),
                                    blank=True, null=True)
 
-    objects = PassThroughManager.for_queryset_class(GalleryQuerySet)()
+    #objects = PassThroughManager.for_queryset_class(GalleryQuerySet)()
+    objects = GalleryQuerySet.as_manager()
 
     class Meta:
         ordering = ['-date_added']
@@ -422,21 +432,16 @@ class ImageModel(models.Model):
     class Meta:
         abstract = True
 
-    @property
-    def EXIF(self):
+    def EXIF(self, file=None):
         try:
-            f = self.image.storage.open(self.image.name, 'rb')
-            tags = EXIF.process_file(f)
-            f.close()
+            if file:
+                tags = exifread.process_file(file)
+            else:
+                with self.image.storage.open(self.image.name, 'rb') as file:
+                    tags = exifread.process_file(file, details=False)
             return tags
         except:
-            try:
-                f = self.image.storage.open(self.image.name, 'rb')
-                tags = EXIF.process_file(f, details=False)
-                f.close()
-                return tags
-            except:
-                return {}
+            return {}
 
     def admin_thumbnail(self):
         func = getattr(self, 'get_admin_thumbnail_url', None)
@@ -588,6 +593,10 @@ class ImageModel(models.Model):
             im = self.effect.pre_process(im)
         elif photosize.effect is not None:
             im = photosize.effect.pre_process(im)
+        # Rotate if found & necessary
+        if 'Image Orientation' in self.EXIF() and \
+                self.EXIF().get('Image Orientation').values[0] in IMAGE_EXIF_ORIENTATION_MAP:
+            im = im.transpose(IMAGE_EXIF_ORIENTATION_MAP[self.EXIF().get('Image Orientation').values[0]])
         # Resize/crop image
         if im.size != photosize.size and photosize.size != (0, 0):
             im = self.resize_image(im, photosize)
@@ -686,7 +695,8 @@ class Photo(ImageModel):
     sites = models.ManyToManyField(Site, verbose_name=_(u'sites'),
                                    blank=True, null=True)
 
-    objects = PassThroughManager.for_queryset_class(PhotoQuerySet)()
+    #objects = PassThroughManager.for_queryset_class(PhotoQuerySet)()
+    objects = PhotoQuerySet.as_manager()
 
     class Meta:
         ordering = ['-date_added']

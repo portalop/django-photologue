@@ -15,11 +15,13 @@ from django.utils.encoding import force_text
 from django.utils.translation import ugettext as _
 from django.forms.widgets import flatatt
 from django.utils.html import format_html
-from photologue.models import Photo, CustomCrop, PhotoSize
+from photologue.models import Photo, Gallery, CustomCrop, PhotoSize
 
 class PhotoWidget(forms.Widget):
     def __init__(self, widget, model, image_size):
-        self.is_hidden = widget.is_hidden
+        #self.is_hidden = widget.is_hidden
+        if hasattr(self, 'input_type'):
+            self.input_type = 'hidden' if widget.is_hidden else self.input_type
         self.needs_multipart_form = widget.needs_multipart_form
         self.attrs = widget.attrs
         self.choices = widget.choices
@@ -40,6 +42,15 @@ class PhotoWidget(forms.Widget):
                            js=('photologue/js/jquery-1.11.1.min.js', 'photologue/js/image-picker.js',))
 
     def render(self, name, value, attrs=None, choices=()):
+        # try:
+        #     name.index("__prefix__")
+
+        #     import string
+        #     import random
+        #     name = name.replace("__prefix__", "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(10)))
+        # except ValueError:
+        #     pass
+
         model = self.model
         info = (model._meta.app_label, model._meta.object_name.lower())
         photo_object = None
@@ -54,6 +65,7 @@ class PhotoWidget(forms.Widget):
             'admin:%s_%s_add'
             % info, current_app=admin.site.name
         )
+
         output = [format_html('<div class="image_picker_wrapper"><p class="links"><img src="{5}?{6}" class="selected_image" /><a id="add_{0}" href="{1}?photosize={2}" onclick="return showAddAnotherPopup(this);">{3}</a> <a href="#" onclick="return toggleImagePicker(\'{0}\');">{4}</a></p>',
                               id, add_image_link, self.image_size, '+ Añadir imagen nueva', 'Elegir una imagen ya subida', photo_url, datetime.now().time().microsecond)]
         output.append(format_html('<select data-id="{1}" data-image-size="{2}" data-lookup-path="{3}"{0}>', flatatt(self.build_attrs(attrs, name=name, id=id)), id, self.image_size, reverse('photologue:pl-image-lookup')))
@@ -61,6 +73,11 @@ class PhotoWidget(forms.Widget):
         if options:
             output.append(options)
         output.append('</select></div>')
+
+        output.append('<p>Elegir una imagen de un álbum:</p>')
+            output.append('<a href="#load_' + id + '" onclick="return load_images(\'' + id + '\', -1);">Sin clasificar</a> ')
+        for album in Gallery.objects.all():
+            output.append('<a href="#load_' + id + '" onclick="return load_images(\'' + id + '\', ' + album.id + ');">%s</a> ' % album.title)
         output.append('<script type="text/javascript">$("#id_' + name + '").imagepicker({show_label:true});</script>')
         return mark_safe(''.join(output))
 

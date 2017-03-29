@@ -29,6 +29,7 @@ setup(
             'res/*.jpg',
             'locale/*/LC_MESSAGES/*',
             'templates/photologue/*.html',
+            'templates/admin/*.html',
             'templates/photologue/tags/*.html',
             'static/photologue/css/*.css',
             'static/photologue/js/*.js',

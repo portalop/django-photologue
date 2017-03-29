@@ -42,6 +42,7 @@ class CustomCropAdminForm(forms.ModelForm):
 
     class Meta:
         model = CustomCrop
+        fields = "__all__"
 
 
 class PhotoAdminForm(forms.ModelForm):

@@ -132,12 +132,20 @@ class ImageLookupView(View):
         exclude_ids = self.request.GET["exclude_ids"].split(",")
         if exclude_ids == ['']:
             exclude_ids = []
-        for photo in Photo.objects.all().exclude(id__in=exclude_ids)[:15]:
+        queryset = Photo.objects.all().exclude(id__in=exclude_ids)
+        album_id = None
+        try:
+          album_id = int(self.request.GET["album_id"])
+          if album_id:
+            queryset = queryset.filter(galleries=album_id)
+        except:
+          pass
+        for photo in queryset[:15]:
             options.append(format_html('<option data-img-src="{1}" data-crop-url="{2}" value="{0}">',
                                         photo.id,
                                         photo._get_SIZE_url(self.request.GET["image_size"]),
                                         ''.join([custom_crop, '?photo_id=', str(photo.id), '&photosize_id=', str(PhotoSize.objects.get(name=self.request.GET["image_size"]).id)])) + unicode(photo) + '</option>')
-        resp = {'new_options': ''.join(options),}
+        resp = {'new_options': ''.join(options), 'pages': pages}
         return HttpResponse(json.dumps(resp), content_type="application/json" )
     make_object_list = True
 

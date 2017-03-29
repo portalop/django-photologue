@@ -326,4 +326,4 @@ class CustomCropAdmin(admin.ModelAdmin):
 
 admin.site.register(CustomCrop, CustomCropAdmin)
 
-adminwidgetswap.swap_model_field()
+#adminwidgetswap.swap_model_field()
