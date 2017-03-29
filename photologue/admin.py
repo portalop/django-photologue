@@ -239,7 +239,7 @@ class PhotoAdmin(admin.ModelAdmin):
             gallery_obj.save()
 
     def get_form(self, request, obj=None, **kwargs):
-        a = super(PhotoAdmin, self).get_form(request, obj=None, **kwargs)
+        a = super(PhotoAdmin, self).get_form(request, obj, **kwargs)
         a.request = request
         return a
 
@@ -325,5 +325,3 @@ class CustomCropAdmin(admin.ModelAdmin):
 
 
 admin.site.register(CustomCrop, CustomCropAdmin)
-
-#adminwidgetswap.swap_model_field()

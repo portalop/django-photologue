@@ -143,6 +143,8 @@ class ImageLookupView(View):
           queryset = queryset.filter(galleries=gallery_id)
         elif gallery_id == 0:
           queryset = queryset.filter(galleries=None)
+        if self.request.GET["search"]:
+          queryset = queryset.filter(title__icontains=self.request.GET["search"])
         paginas = Paginator(queryset, 15)
         for photo in paginas.page(int(self.request.GET["page"])).object_list:
             options.append(format_html('<option data-img-src="{1}" data-crop-url="{2}" value="{0}">',

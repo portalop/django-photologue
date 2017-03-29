@@ -71,6 +71,7 @@
         //"exclude_ids": exclude_ids.join(','), 
         "image_size": $sel.data("use-admin-thumbnail")?'admin_thumbnail':$sel.data("image-size"), 
         "gallery_id": $sel.data("gallery"), 
+        "search": $sel.data("search"), 
         "page": $sel.data("page")
       },
       success: function(data) {
@@ -84,6 +85,7 @@
         $sel.empty();
         $sel.append(data.new_options);
         $sel.imagepicker($sel.data("picker").opts);
+        $sel.data("picker").picker.find('li.menu').remove();
         $sel.data("picker").picker.prepend(menu);
         $sel.data("picker").picker.show();
       },

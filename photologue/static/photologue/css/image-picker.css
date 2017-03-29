@@ -55,3 +55,7 @@ div.image_picker_wrapper p.links a {
 div.image_picker_wrapper div.menu a.active {
   border:1px solid Red;
 }
+
+div.image_picker_wrapper .menu {
+  width: 100%;
+}
