@@ -1,7 +1,7 @@
 <div class="image_picker_wrapper">
     <p class="links">
-        <img src="{{ photo_url }}" class="selected_image" />
-        <a id="add_{{ id }}" href="{{ add_image_link }}?photosize={{ image_size }}" onclick="return showAddAnotherPopup(this);">+ Añadir imagen nueva</a>
+        <img src="{{ photo_url }}?{% now 'u' %}" class="selected_image" />
+        <a id="add_{{ id }}" href="{{ add_image_link }}?photosize={{ image_size }}&_popup=1&_to_field=id" onclick="return showAddAnotherPopup(this);">+ Añadir imagen nueva</a>
         <a href="#{{ id }}" onclick="return toggleImagePicker('{{ id }}');">Elegir una imagen ya subida</a>
     </p>
     <select data-id="{{ id }}" data-image-size="{{ image_size }}" data-lookup-path="{% url 'photologue:pl-image-lookup' %}" data-gallery="-1" data-use-admin-thumbnail="1" data-search="" data-page="1"{{ select_attrs }}>

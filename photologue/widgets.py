@@ -95,7 +95,8 @@ class PhotoWidget(forms.Widget):
             'image_size': self.image_size, 
             'add_image_link': add_image_link, 
             'select_attrs': flatatt(self.build_attrs(attrs, name=name, id=id)),
-            'paginator': Paginator(self.choices, 15)
+            'paginator': Paginator(self.choices, 15),
+            'photo_url': photo_url
         })
         # return mark_safe(''.join(output))
 

@@ -18,6 +18,11 @@
       return this.each(function() {
         var select;
         select = jQuery(this);
+        //alert(select.next('ul').find('li.menu div.menu').length);
+        if (select.next('ul').find('li.menu div.menu').length) {
+          select.parent().append(select.next('ul').find('li.menu div.menu'));
+          //alert(select.find('li.menu div.menu'));
+        }
         if (select.data("picker")) {
           select.data("picker").destroy();
         }
