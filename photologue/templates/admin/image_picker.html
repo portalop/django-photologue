@@ -1,0 +1,30 @@
+<div class="image_picker_wrapper">
+    <p class="links">
+        <img src="{{ photo_url }}?{% now 'u' %}" class="selected_image" />
+        <a id="add_{{ id }}" href="{{ add_image_link }}?photosize={{ image_size }}&_popup=1&_to_field=id" onclick="return showAddAnotherPopup(this);">+ Añadir imagen nueva</a>
+        <a href="#{{ id }}" onclick="return toggleImagePicker('{{ id }}');">Elegir una imagen ya subida</a>
+    </p>
+    <select data-id="{{ id }}" data-image-size="{{ image_size }}" data-lookup-path="{% url 'photologue:pl-image-lookup' %}" data-gallery="-1" data-use-admin-thumbnail="1" data-search="" data-page="1"{{ select_attrs }}>
+        {{ options|safe }}
+    </select>
+    <div class="menu">
+        <p id="gallery_{{ id }}">Elegir álbum: 
+            <a id="gallery_{{ id }}_-1" href="#{{ id }}" class="active" onclick="return load_images('{{ id }}', 'gallery', -1);"><em>(Todas)</em></a> <a id="gallery_{{ id }}_0" href="#{{ id }}" onclick="return load_images('{{ id }}', 'gallery', 0);"><em>(Sin clasificar)</em></a>
+            {% for gallery in galleries %}
+                <a id="gallery_{{ id }}_{{ gallery.id }}" href="#{{ id }}" onclick="return load_images('{{ id }}', 'gallery', {{ gallery.id }});">{{ gallery.title }}</a>
+            {% endfor %}
+        </p>
+        <p id="use_admin_thumbnail_{{ id }}">Tamaño de imagen:
+            <a id="use_admin_thumbnail_{{ id }}_1" href="#{{ id }}" onclick="return load_images('{{ id }}', 'use-admin-thumbnail', 1);" class="active">Icono admin</a>
+            <a id="use_admin_thumbnail_{{ id }}_0" href="#{{ id }}" onclick="return load_images('{{ id }}', 'use-admin-thumbnail', 0);">{{ image_size }}</a>
+        </p>
+        <p id="search_{{id}}">Buscar por título: <input id="input_search_{{ id }}" class="vTextField" maxlength="120" name="input_search_{{ id }}" required="" type="text"> <a id="input_search_{{ id }}" href="#{{ id }}" onclick="return load_images('{{ id }}', 'search', $('#input_search_{{ id }}').val());">Buscar</a>
+        </p>
+        <p id="page_{{ id }}" class="pages">Páginas:
+            {% for page in paginator.page_range %}
+                <a id="page_{{ id }}_{{ page }}"{% if page == 1 %} class="active"{% endif %} href="#{{ id }}" onclick="return load_images('{{ id }}', 'page', {{ page }});">{{ page }}</a>
+            {% endfor %}
+        </p>
+    </div>
+</div>
+<script type="text/javascript">$("#{{ id }}").imagepicker({show_label:true});</script>

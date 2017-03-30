@@ -10,11 +10,13 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin.templatetags.admin_static import static
 from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator
 from django.utils.safestring import mark_safe
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext as _
 from django.forms.widgets import flatatt
 from django.utils.html import format_html
+from django.template.loader import render_to_string
 from photologue.models import Photo, Gallery, CustomCrop, PhotoSize
 
 class PhotoWidget(forms.Widget):
@@ -66,20 +68,37 @@ class PhotoWidget(forms.Widget):
             % info, current_app=admin.site.name
         )
 
-        output = [format_html('<div class="image_picker_wrapper"><p class="links"><img src="{5}?{6}" class="selected_image" /><a id="add_{0}" href="{1}?photosize={2}" onclick="return showAddAnotherPopup(this);">{3}</a> <a href="#" onclick="return toggleImagePicker(\'{0}\');">{4}</a></p>',
-                              id, add_image_link, self.image_size, '+ Añadir imagen nueva', 'Elegir una imagen ya subida', photo_url, datetime.now().time().microsecond)]
-        output.append(format_html('<select data-id="{1}" data-image-size="{2}" data-lookup-path="{3}"{0}>', flatatt(self.build_attrs(attrs, name=name, id=id)), id, self.image_size, reverse('photologue:pl-image-lookup')))
-        options = self.render_options(choices, [value])
-        if options:
-            output.append(options)
-        output.append('</select></div>')
+        # output = [format_html('<div class="image_picker_wrapper"><p class="links"><img src="{5}?{6}" class="selected_image" /><a id="add_{0}" href="{1}?photosize={2}" onclick="return showAddAnotherPopup(this);">{3}</a> <a href="#{0}" onclick="return toggleImagePicker(\'{0}\');">{4}</a></p>',
+        #                       id, add_image_link, self.image_size, '+ Añadir imagen nueva', 'Elegir una imagen ya subida', photo_url, datetime.now().time().microsecond)]
+        # output.append(format_html('<select data-id="{1}" data-image-size="{2}" data-lookup-path="{3}" data-gallery="-1" data-use-admin-thumbnail="1" data-page="1"{0}>', flatatt(self.build_attrs(attrs, name=name, id=id)), id, self.image_size, reverse('photologue:pl-image-lookup')))
+        # options = self.render_options(choices, [value])
+        # if options:
+        #     output.append(options)
+        # output.append('</select>')
 
-        output.append('<p>Elegir una imagen de un álbum:</p>')
-            output.append('<a href="#load_' + id + '" onclick="return load_images(\'' + id + '\', -1);">Sin clasificar</a> ')
-        for album in Gallery.objects.all():
-            output.append('<a href="#load_' + id + '" onclick="return load_images(\'' + id + '\', ' + album.id + ');">%s</a> ' % album.title)
-        output.append('<script type="text/javascript">$("#id_' + name + '").imagepicker({show_label:true});</script>')
-        return mark_safe(''.join(output))
+        # output.append('<div class="menu"><p id="gallery_{0}">Elegir álbum: '.format(id))
+        # output.append('<a id="gallery_{0}_-1" href="#{0}" class="active" onclick="return load_images(\'{0}\', \'gallery\', -1);"><em>(Todas)</em></a> <a id="gallery_{0}_0" href="#{0}" onclick="return load_images(\'{0}\', \'gallery\', 0);"><em>(Sin clasificar)</em></a> '.format(id))
+        # for album in Gallery.objects.all():
+        #     output.append('<a id="gallery_{0}_{1}" href="#{0}" onclick="return load_images(\'{0}\', \'gallery\', {1});">{2}</a>'.format(id, album.id, album.title))
+        # output.append('</p>')
+        # cambiar_tamanyo = '<a id="use_admin_thumbnail_' + id + '_%s" href="#' + id + '" onclick="return load_images(\'' + id + '\', \'use-admin-thumbnail\', %s);"%s>%s</a>'
+        # output.append('<p id="use_admin_thumbnail_{0}">Tamaño de imagen: {1} {2}</p>'.format(id, cambiar_tamanyo % (1, 1, ' class="active"', 'Icono admin'), cambiar_tamanyo % (0, 0, '', self.image_size)))
+        # output.append('<p id="page_{0}" class="pages">Páginas: '.format(id))
+        # for page in Paginator(self.choices, 15).page_range:
+        #     output.append('<a id="page_{0}_{1}"{2} href="#{0}" onclick="return load_images(\'{0}\', \'page\', {1});">{1}</a>'.format(id, page, ' class="active"' if page==1 else ''))
+        # output.append('</p>')
+        # output.append('</div></div><script type="text/javascript">$("#id_' + name + '").imagepicker({show_label:true});</script>')
+        return render_to_string('admin/image_picker.html', {
+            'galleries': Gallery.objects.all(), 
+            'options': self.render_options(choices, [value]), 
+            'id': id, 
+            'image_size': self.image_size, 
+            'add_image_link': add_image_link, 
+            'select_attrs': flatatt(self.build_attrs(attrs, name=name, id=id)),
+            'paginator': Paginator(self.choices, 15),
+            'photo_url': photo_url
+        })
+        # return mark_safe(''.join(output))
 
     def render_option(self, selected_choices, option_value, option_label):
         if option_value is None:
@@ -115,7 +134,7 @@ class PhotoWidget(forms.Widget):
                                option_value,
                                selected_html,
                                force_text(option_label),
-                               Photo.objects.get(pk=option_value)._get_SIZE_url(self.image_size),
+                               Photo.objects.get(pk=option_value).get_admin_thumbnail_url(),#_get_SIZE_url(self.image_size),
                                ''.join([custom_crop, '?photo_id=', option_value, '&photosize_id=', str(PhotoSize.objects.get(name=self.image_size).id)]))
 
     def render_options(self, choices, selected_choices):

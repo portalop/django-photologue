@@ -15,6 +15,7 @@ from django.contrib import admin
 from django.core.urlresolvers import reverse
 from django.views.generic.base import RedirectView
 from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator
 
 from .models import Photo, Gallery
 
@@ -129,23 +130,28 @@ class ImageLookupView(View):
             'admin:%s_%s_add'
             % (CustomCrop._meta.app_label, CustomCrop._meta.model_name), current_app=admin.site.name
         )
-        exclude_ids = self.request.GET["exclude_ids"].split(",")
-        if exclude_ids == ['']:
-            exclude_ids = []
-        queryset = Photo.objects.all().exclude(id__in=exclude_ids)
-        album_id = None
+        #exclude_ids = self.request.GET["exclude_ids"].split(",")
+        #if exclude_ids == ['']:
+        #    exclude_ids = []
+        queryset = Photo.objects.all()#.exclude(id__in=exclude_ids)
+        gallery_id = -1
         try:
-          album_id = int(self.request.GET["album_id"])
-          if album_id:
-            queryset = queryset.filter(galleries=album_id)
+          gallery_id = int(self.request.GET["gallery_id"])
         except:
-          pass
-        for photo in queryset[:15]:
+          gallery_id = -1
+        if gallery_id > 0:
+          queryset = queryset.filter(galleries=gallery_id)
+        elif gallery_id == 0:
+          queryset = queryset.filter(galleries=None)
+        if self.request.GET["search"]:
+          queryset = queryset.filter(title__icontains=self.request.GET["search"])
+        paginas = Paginator(queryset, 15)
+        for photo in paginas.page(int(self.request.GET["page"])).object_list:
             options.append(format_html('<option data-img-src="{1}" data-crop-url="{2}" value="{0}">',
                                         photo.id,
                                         photo._get_SIZE_url(self.request.GET["image_size"]),
                                         ''.join([custom_crop, '?photo_id=', str(photo.id), '&photosize_id=', str(PhotoSize.objects.get(name=self.request.GET["image_size"]).id)])) + unicode(photo) + '</option>')
-        resp = {'new_options': ''.join(options), 'pages': pages}
+        resp = {'new_options': ''.join(options), 'pages': list(paginas.page_range)}
         return HttpResponse(json.dumps(resp), content_type="application/json" )
     make_object_list = True
 
