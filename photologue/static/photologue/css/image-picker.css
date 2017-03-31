@@ -1,9 +1,11 @@
 ul.thumbnails.image_picker_selector {
+  background-color: #FCFCFC;
+  border: 1px solid #ccc;
   overflow: auto;
   list-style-image: none;
   list-style-position: outside;
   list-style-type: none;
-  padding: 0px;
+  padding: 10px;
   margin: 0px; }
   ul.thumbnails.image_picker_selector ul {
     overflow: auto;
@@ -29,12 +31,24 @@ ul.thumbnails.image_picker_selector {
       background: #0088cc; }
     ul.thumbnails.image_picker_selector li .thumbnail.selected p {
       color: #FFFFFF; }
+    ul.thumbnails.image_picker_selector li.menu {
+      border: 1px solid #ccc; }
     ul.thumbnails.image_picker_selector li p {
-      padding: 7px 0; }
+      padding: 7px; }
+    ul.thumbnails.image_picker_selector li p#gallery_id_imagen,
+    ul.thumbnails.image_picker_selector li p#search_id_imagen,
+    ul.thumbnails.image_picker_selector li p#search_id_imagen{
+      background-color: #E9E9E9;
+      }
+    ul.thumbnails.image_picker_selector li p#use_admin_thumbnail_id_imagen,
+    ul.thumbnails.image_picker_selector li p#page_id_imagen{
+      background-color: #F3F3F4;
+      }      
     ul.thumbnails.image_picker_selector li a {
       margin-left: 10px;
       text-decoration: underline;
-      padding: 3px 7px; }
+      padding: 3px 7px;
+      display: inline-block;}
 
 
 div.image_picker_wrapper p.links {
@@ -53,7 +67,8 @@ div.image_picker_wrapper p.links a {
 }
 
 div.image_picker_wrapper div.menu a.active {
-  border:1px solid Red;
+  background-color: #0088cc;
+  color: #FFFFFF;
 }
 
 div.image_picker_wrapper .menu {
