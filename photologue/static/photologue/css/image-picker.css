@@ -35,13 +35,10 @@ ul.thumbnails.image_picker_selector {
       border: 1px solid #ccc; }
     ul.thumbnails.image_picker_selector li p {
       padding: 7px; }
-    ul.thumbnails.image_picker_selector li p#gallery_id_imagen,
-    ul.thumbnails.image_picker_selector li p#search_id_imagen,
-    ul.thumbnails.image_picker_selector li p#search_id_imagen{
+    ul.thumbnails.image_picker_selector li p.gris1{
       background-color: #E9E9E9;
       }
-    ul.thumbnails.image_picker_selector li p#use_admin_thumbnail_id_imagen,
-    ul.thumbnails.image_picker_selector li p#page_id_imagen{
+    ul.thumbnails.image_picker_selector li p.gris2{
       background-color: #F3F3F4;
       }      
     ul.thumbnails.image_picker_selector li a {

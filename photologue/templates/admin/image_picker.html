@@ -8,19 +8,19 @@
         {{ options|safe }}
     </select>
     <div class="menu">
-        <p id="gallery_{{ id }}">Elegir álbum: 
+        <p id="gallery_{{ id }}" class="gris1">Elegir álbum: 
             <a id="gallery_{{ id }}_-1" href="#{{ id }}" class="active" onclick="return load_images('{{ id }}', 'gallery', -1);"><em>(Todas)</em></a> <a id="gallery_{{ id }}_0" href="#{{ id }}" onclick="return load_images('{{ id }}', 'gallery', 0);"><em>(Sin clasificar)</em></a>
             {% for gallery in galleries %}
                 <a id="gallery_{{ id }}_{{ gallery.id }}" href="#{{ id }}" onclick="return load_images('{{ id }}', 'gallery', {{ gallery.id }});">{{ gallery.title }}</a>
             {% endfor %}
         </p>
-        <p id="use_admin_thumbnail_{{ id }}">Tamaño de imagen:
+        <p id="use_admin_thumbnail_{{ id }}" class="gris2">Tamaño de imagen:
             <a id="use_admin_thumbnail_{{ id }}_1" href="#{{ id }}" onclick="return load_images('{{ id }}', 'use-admin-thumbnail', 1);" class="active">Icono admin</a>
             <a id="use_admin_thumbnail_{{ id }}_0" href="#{{ id }}" onclick="return load_images('{{ id }}', 'use-admin-thumbnail', 0);">{{ image_size }}</a>
         </p>
-        <p id="search_{{id}}">Buscar por título: <input id="input_search_{{ id }}" class="vTextField" maxlength="120" name="input_search_{{ id }}" required="" type="text"> <a id="input_search_{{ id }}" href="#{{ id }}" onclick="return load_images('{{ id }}', 'search', $('#input_search_{{ id }}').val());">Buscar</a>
+        <p id="search_{{id}}" class="gris1">Buscar por título: <input id="input_search_{{ id }}" class="vTextField" maxlength="120" name="input_search_{{ id }}" required="" type="text"> <a id="input_search_{{ id }}" href="#{{ id }}" onclick="return load_images('{{ id }}', 'search', $('#input_search_{{ id }}').val());">Buscar</a>
         </p>
-        <p id="page_{{ id }}" class="pages">Páginas:
+        <p id="page_{{ id }}" class="pages gris2">Páginas:
             {% for page in paginator.page_range %}
                 <a id="page_{{ id }}_{{ page }}"{% if page == 1 %} class="active"{% endif %} href="#{{ id }}" onclick="return load_images('{{ id }}', 'page', {{ page }});">{{ page }}</a>
             {% endfor %}
