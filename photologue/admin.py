@@ -321,7 +321,7 @@ class CustomCropAdmin(admin.ModelAdmin):
                 'obj': escapejs(obj),
                 'photo_url': escape(obj.photo._get_SIZE_url(obj.photosize.name))
             })
-        return super(CustomCropAdmin, self).response_add(self, request, obj, post_url_continue)
+        return super(CustomCropAdmin, self).response_add(request, obj, post_url_continue)
 
 
 admin.site.register(CustomCrop, CustomCropAdmin)
