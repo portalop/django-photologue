@@ -1,0 +1,815 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"xad",
+				"xadmin_site"
+			],
+			[
+				"admin",
+				"admin_site"
+			],
+			[
+				"dec",
+				"decrypt_data"
+			],
+			[
+				"convento",
+				"convento_residencia"
+			],
+			[
+				"conven",
+				"convento_residencia"
+			],
+			[
+				"escudo",
+				"escudo_tag"
+			],
+			[
+				"Fami",
+				"FamiliarInline"
+			],
+			[
+				"MA",
+				"MAILCHIMP_UPDATED"
+			],
+			[
+				"MAI",
+				"MAILCHIMP_UNCHANGED"
+			],
+			[
+				"mailchimp",
+				"mailchimp_status"
+			],
+			[
+				"Cat",
+				"CategoriaCasa"
+			],
+			[
+				"R",
+				"RegionAdmin"
+			],
+			[
+				"Pro",
+				"ProvinciaAdmin"
+			],
+			[
+				"Mi",
+				"MIDDLEWARE_CLASSES"
+			],
+			[
+				"fri",
+				"fraile"
+			],
+			[
+				"fecha",
+				"fecha_profesion_simple"
+			],
+			[
+				"pro",
+				"provincia_afiliacion"
+			],
+			[
+				"con",
+				"convento_asignacion"
+			],
+			[
+				"co",
+				"correspondencia"
+			],
+			[
+				"Fra",
+				"FraileAdmin"
+			],
+			[
+				"corr",
+				"correspondencia"
+			],
+			[
+				"obje",
+				"objects"
+			],
+			[
+				"fechapro",
+				"fechaprofesionsolemne"
+			],
+			[
+				"COr",
+				"Correspondencia"
+			],
+			[
+				"provin",
+				"provincia_afiliacion"
+			],
+			[
+				"Cate",
+				"CategoriaCasa"
+			],
+			[
+				"Goo",
+				"GoogleMap"
+			],
+			[
+				"ma",
+				"max_length"
+			],
+			[
+				"last",
+				"last_entry"
+			],
+			[
+				"fo",
+				"found_documents"
+			],
+			[
+				"docu",
+				"documents"
+			],
+			[
+				"fou",
+				"found_events"
+			],
+			[
+				"found_",
+				"found_entries"
+			],
+			[
+				"fa",
+				"False"
+			],
+			[
+				"in",
+				"include_self"
+			],
+			[
+				"get",
+				"get_descendants"
+			],
+			[
+				"pagi",
+				"paginas_list"
+			],
+			[
+				"pa",
+				"paginas_pie"
+			],
+			[
+				"__",
+				"__name__"
+			],
+			[
+				"se",
+				"sender"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "photologue/adminwidgetswap.py",
+			"settings":
+			{
+				"buffer_size": 5989,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "photologue/forms.py",
+			"settings":
+			{
+				"buffer_size": 3401,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "photologue/fields.py",
+			"settings":
+			{
+				"buffer_size": 1482,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "photologue/views.py",
+			"settings":
+			{
+				"buffer_size": 8531,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "photologue/widgets.py",
+			"settings":
+			{
+				"buffer_size": 7105,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "photologue/models.py",
+			"settings":
+			{
+				"buffer_size": 44387,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/C/Bitnami/djangostack-1.7.9-0/python/Lib/site-packages/pystockfish.py",
+			"settings":
+			{
+				"buffer_size": 5879,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/C/Users/Alan/Bitnami Django Stack projects/neuronasactivas/neuronasactivas/settings.py",
+			"settings":
+			{
+				"buffer_size": 11821,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Bitnami/djangostack-1.7.9-0/python/Lib/site-packages/memcache.py",
+			"settings":
+			{
+				"buffer_size": 60189,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "photologue/admin.py",
+			"settings":
+			{
+				"buffer_size": 13009,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "photologue/managers.py",
+			"settings":
+			{
+				"buffer_size": 582,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Z/dominicos_org/dominicos_org/settings.py",
+		"/Z/hispaniae/hispaniae/settings.py",
+		"//desarrollo/home/.virtualenvs/hispaniae/lib/python2.7/site-packages/NginxMemCacheMiddleWare.py",
+		"/C/Users/Alan/AppData/Local/Temp/ez_setup.py",
+		"/C/Users/Alan/AppData/Local/Temp/get-pip.py",
+		"/Z/bd_hispania/gestion_bd_hispania/admin.py",
+		"/Z/bd_hispania/templates/list_moves.html",
+		"/Z/bd_hispania/gestion_bd_hispania/apps.py",
+		"//DESARROLLO/home/projects/bd_selvasamazonicas/gestion_bd_selvasamazonicas/adminx.py",
+		"/Z/bd_fatse/install-apps.sh",
+		"/Z/bd_fatse/bd_fatse/settings.py",
+		"//DESARROLLO/home/projects/bd_selvasamazonicas/bd_selvasamazonicas/settings.py",
+		"//DESARROLLO/home/projects/apps/django-photologue/photologue/forms.py",
+		"//DESARROLLO/home/projects/bd_fatse/install-apps.sh",
+		"/Z/bd_hispania/bd_hispania/settings.py",
+		"/Z/bd_hispania/bd_hispania/urls.py",
+		"/Z/bd_hispania/bd_hispania/wsgi.py",
+		"//DESARROLLO/home/projects/patrimonio/patrimonio/settings.py",
+		"//DESARROLLO/home/projects/hispaniae/hispaniae/settings.py",
+		"//DESARROLLO/home/.virtualenvs/hispaniae/lib/python2.7/site-packages/opress/middleware.py",
+		"//DESARROLLO/home/projects/apps/django-opress/opress/signals.py",
+		"//DESARROLLO/home/projects/apps/django-opress/opress/apps.py",
+		"//DESARROLLO/home/projects/bd_hispania/gestion_bd_hispania/apps.py",
+		"//DESARROLLO/home/projects/bd_hispania/gestion_bd_hispania/signals.py",
+		"//DESARROLLO/home/.virtualenvs/hispaniae/lib/python2.7/site-packages/NginxMemCacheMiddleWare.py",
+		"/Z/bd_hispania/gestion_bd_hispania/models.py",
+		"//DESARROLLO/home/.virtualenvs/bd_hispania/lib/python2.7/site-packages/encrypted_fields/fields.py",
+		"/Z/apps/django-opress/opress/views.py",
+		"//DESARROLLO/home/.virtualenvs/bd_hispania/lib/python2.7/site-packages/django/contrib/admin/views/main.py",
+		"//desarrollo/home/projects/apps/django-opress/opress/admin.py",
+		"//DESARROLLO/home/.virtualenvs/bd_hispania/lib/python2.7/site-packages/django/db/models/query.py",
+		"/Z/bd_hispania/gestion_bd_hispania/import_temp_bd.py",
+		"/Z/patrimonio/gestion_patrimonio/models.py",
+		"//DESARROLLO/home/projects/bd_fatse/bd_fatse/wsgi.py",
+		"//DESARROLLO/home/projects/bd_fatse/bd_fatse/monitor.py",
+		"//DESARROLLO/home/projects/apps/django-opress/opress/models.py",
+		"//DESARROLLO/home/projects/hispaniae/hispaniae/models.py",
+		"//DESARROLLO/home/projects/hispaniae/templates/opress/index.html",
+		"/Z/hispaniae/templates/opress/base.html",
+		"/Z/bd_fatse/manage.py",
+		"/Z/bd_fatse/gestion_bd_fatse/views.py",
+		"//DESARROLLO/home/projects/bd_hispania/gestion_bd_hispania/admin.py",
+		"/Z/bd_hispania/gestion_bd_hispania/adminx.py",
+		"//DESARROLLO/home/.virtualenvs/bd_hispania/lib/python2.7/site-packages/xadmin/forms.py",
+		"//DESARROLLO/home/projects/patrimonio/gestion_patrimonio/admin.py",
+		"/Z/bd_fatse/gestion_bd_fatse/urls.py",
+		"/Z/bd_fatse/bd_fatse/urls.py",
+		"/Z/bd_fatse/bd_fatse/dashboard.py",
+		"//DESARROLLO/home/projects/bd_fatse/bd_fatse/settings.py",
+		"/Z/bd_hispania/gestion_bd_hispania/xadmin.py",
+		"//DESARROLLO/home/.virtualenvs/hispaniae/lib/python2.7/site-packages/django-profile.py",
+		"//DESARROLLO/home/.virtualenvs/hispaniae/lib/python2.7/site-packages/mptt/templatetags/mptt_tags.py",
+		"//desarrollo/home/projects/apps/django-opress/opress/views.py",
+		"/Z/apps/django-opress/opress/middleware.py",
+		"/Z/hispaniae/hispaniae/views.py",
+		"//desarrollo/home/projects/hispaniae/hispaniae/models.py",
+		"//desarrollo/home/projects/hispaniae/hispaniae/views.py",
+		"//DESARROLLO/home/.virtualenvs/bd_hispania/lib/python2.7/site-packages/django/db/models/lookups.py",
+		"//DESARROLLO/home/.virtualenvs/bd_hispania/lib/python2.7/site-packages/django/db/backends/util.py",
+		"//DESARROLLO/home/.virtualenvs/bd_hispania/lib/python2.7/site-packages/django/db/backends/mysql/schema.py",
+		"//DESARROLLO/home/.virtualenvs/bd_hispania/lib/python2.7/site-packages/django/db/backends/mysql/base.py",
+		"//DESARROLLO/home/.virtualenvs/bd_hispania/lib/python2.7/site-packages/django/db/backends/mysql/client.py",
+		"//DESARROLLO/home/.virtualenvs/bd_hispania/lib/python2.7/site-packages/grappelli/forms.py",
+		"/Z/bd_fatse/gestion_bd_fatse/admin.py",
+		"//DESARROLLO/home/projects/bd_selvasamazonicas/gestion_bd_selvasamazonicas/admin.py",
+		"//DESARROLLO/home/projects/bd_hispania/gestion_bd_hispania/migrations/0001_initial.py",
+		"//DESARROLLO/home/projects/bd_hispania/gestion_bd_hispania/migrations/0002_auto_20150310_0819.py",
+		"//DESARROLLO/home/projects/bd_selvasamazonicas/gestion_bd_selvasamazonicas/models.py",
+		"/Z/bd_fatse/gestion_bd_fatse/models.py",
+		"/C/Users/Alan/AppData/Local/Temp/7zOCDC13E99/forms.py",
+		"/C/Users/Alan/AppData/Local/Temp/7zO47E72F69/forms.py",
+		"//DESARROLLO/home/projects/apps/django-opress/opress/admin.py",
+		"//DESARROLLO/home/projects/apps/django-opress/opress/static/opress/js/opress.js",
+		"//DESARROLLO/home/projects/apps/django-opress/opress/forms.py",
+		"//DESARROLLO/home/projects/hispaniae/templates/opress/contact.html",
+		"/Z/apps/django-opress/opress/context_processors.py",
+		"/Z/hispaniae/templates/opress/static_page.html",
+		"//DESARROLLO/home/projects/hispaniae/error/500.html",
+		"//DESARROLLO/home/projects/hispaniae/deploy_code.sh",
+		"//DESARROLLO/home/projects/apps/django-opress/opress/management/commands/clear_cache.py",
+		"//DESARROLLO/home/projects/apps/django-opress/setup.py",
+		"//DESARROLLO/home/projects/apps/django-opress/opress/search.py",
+		"/Z/apps/django-photologue/setup.py",
+		"//DESARROLLO/home/projects/hispaniae/templates/opress/bloque.html",
+		"/Z/hispaniae/templates/opress/documents.html",
+		"//DESARROLLO/home/projects/hispaniae/templates/opress/newsletter.html",
+		"//DESARROLLO/home/projects/hispaniae/static/admin/img/newsletter/header.htm",
+		"//DESARROLLO/home/projects/hispaniae/templates/opress/news_detail.html",
+		"//DESARROLLO/home/projects/apps/django-opress/opress/urls.py",
+		"//DESARROLLO/home/projects/apps/django-opress/opress/views.py",
+		"/Z/hispaniae/hispaniae/urls.py",
+		"/Z/apps/django-opress/opress/__init__.py",
+		"//DESARROLLO/home/projects/patrimonio/gestion_patrimonio/models.py",
+		"/Z/hispaniae/templates/opress/email/contact.html",
+		"//DESARROLLO/home/projects/hispaniae/templates/opress/base.html",
+		"/Z/hispaniae/templates/opress/contact.html",
+		"/Z/hispaniae/templates/opress/search_more.html",
+		"/Z/hispaniae/templates/opress/search.html",
+		"//DESARROLLO/home/projects/hispaniae/templates/opress/search_more.html",
+		"//DESARROLLO/home/projects/hispaniae/templates/base.html",
+		"/Z/hispaniae/static/hispaniae/html/500.html",
+		"/Z/hispaniae/templates/404.html",
+		"//DESARROLLO/home/projects/hispaniae/templates/opress/404.html",
+		"/Z/apps/django-photologue/photologue/management/commands/plcache.py",
+		"/Z/apps/django-photologue/photologue/management/commands/__init__.py",
+		"/Z/apps/django-photologue/photologue/management/__init__.py",
+		"//DESARROLLO/home/projects/hispaniae/install-apps.sh",
+		"/C/Users/Alan/AppData/Roaming/Sublime Text 2/Packages/User/Preferences.sublime-settings"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"get_storage_path",
+			"cache_path",
+			"prueba",
+			"PhotoWidget",
+			"EncryptedIntegerField",
+			"_filter_or_exclude",
+			"filter",
+			"EncryptedDateTimeField",
+			"=true",
+			"patrimonio",
+			"dominicoshispaniae.es",
+			"APPEND_SLASH",
+			"documents_list",
+			"/hispaniae/static",
+			"404"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"EncryptedDateField",
+			"=True",
+			"bd_fatse",
+			"found_entries",
+			"/static"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 7,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "photologue/adminwidgetswap.py",
+					"settings":
+					{
+						"buffer_size": 5989,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								309,
+								309
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 75.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "photologue/forms.py",
+					"settings":
+					{
+						"buffer_size": 3401,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2647,
+								2647
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 135.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "photologue/fields.py",
+					"settings":
+					{
+						"buffer_size": 1482,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1102,
+								1102
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "photologue/views.py",
+					"settings":
+					{
+						"buffer_size": 8531,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "photologue/widgets.py",
+					"settings":
+					{
+						"buffer_size": 7105,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1371,
+								1371
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 116.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "photologue/models.py",
+					"settings":
+					{
+						"buffer_size": 44387,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4039,
+								4039
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 900.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "/C/Bitnami/djangostack-1.7.9-0/python/Lib/site-packages/pystockfish.py",
+					"settings":
+					{
+						"buffer_size": 5879,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								345,
+								345
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1170.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "/C/Users/Alan/Bitnami Django Stack projects/neuronasactivas/neuronasactivas/settings.py",
+					"settings":
+					{
+						"buffer_size": 11821,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2555,
+								2555
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 270.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "/C/Bitnami/djangostack-1.7.9-0/python/Lib/site-packages/memcache.py",
+					"settings":
+					{
+						"buffer_size": 60189,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								48770,
+								48770
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 19350.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "photologue/admin.py",
+					"settings":
+					{
+						"buffer_size": 13009,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								11971,
+								11971
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4238.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "photologue/managers.py",
+					"settings":
+					{
+						"buffer_size": 582,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 219.0,
+	"status_bar_visible": true
+}

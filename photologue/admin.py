@@ -323,5 +323,4 @@ class CustomCropAdmin(admin.ModelAdmin):
             })
         return super(CustomCropAdmin, self).response_add(request, obj, post_url_continue)
 
-
 admin.site.register(CustomCrop, CustomCropAdmin)
