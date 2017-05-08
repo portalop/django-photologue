@@ -16,6 +16,7 @@ from django.core.urlresolvers import reverse
 from django.views.generic.base import RedirectView
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404
 
 from .models import Photo, Gallery
 
@@ -146,11 +147,16 @@ class ImageLookupView(View):
         if self.request.GET["search"]:
           queryset = queryset.filter(title__icontains=self.request.GET["search"])
         paginas = Paginator(queryset, 15)
-        for photo in paginas.page(int(self.request.GET["page"])).object_list:
+        photos_list = list(paginas.page(int(self.request.GET["page"])).object_list)
+        if self.request.GET["selected_id"]:
+          selected_photo = get_object_or_404(Photo, id=int(self.request.GET["selected_id"]))
+          if selected_photo not in photos_list:
+            photos_list.insert(0, selected_photo)
+        for photo in photos_list:
             options.append(format_html('<option data-img-src="{1}" data-crop-url="{2}" value="{0}">',
                                         photo.id,
                                         photo._get_SIZE_url(self.request.GET["image_size"]),
-                                        ''.join([custom_crop, '?photo_id=', str(photo.id), '&photosize_id=', str(PhotoSize.objects.get(name=self.request.GET["image_size"]).id)])) + unicode(photo) + '</option>')
+                                        ''.join([custom_crop, '?_to_field=id&_popup=1&photo_id=', str(photo.id), '&photosize_id=', str(PhotoSize.objects.get(name=self.request.GET["image_size"]).id)])) + unicode(photo) + '</option>')
         resp = {'new_options': ''.join(options), 'pages': list(paginas.page_range)}
         return HttpResponse(json.dumps(resp), content_type="application/json" )
     make_object_list = True

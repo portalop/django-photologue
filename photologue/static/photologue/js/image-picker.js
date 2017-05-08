@@ -73,9 +73,10 @@
       url: $sel.data("lookup-path"),
       data: {
         //"exclude_ids": exclude_ids.join(','), 
-        "image_size": $sel.data("use-admin-thumbnail")?'admin_thumbnail':$sel.data("image-size"), 
-        "gallery_id": $sel.data("gallery"), 
-        "search": $sel.data("search"), 
+        "image_size": $sel.data("use-admin-thumbnail")?'admin_thumbnail':$sel.data("image-size"),
+        "gallery_id": $sel.data("gallery"),
+        "selected_id": $sel.val(),
+        "search": $sel.data("search"),
         "page": $sel.data("page")
       },
       success: function(data) {

@@ -134,14 +134,14 @@ class PhotoWidget(forms.Widget):
                                option_value,
                                selected_html,
                                force_text(option_label),
-                               Photo.objects.get(pk=option_value).get_admin_thumbnail_url(),#_get_SIZE_url(self.image_size),
-                               ''.join([custom_crop, '?photo_id=', option_value, '&photosize_id=', str(PhotoSize.objects.get(name=self.image_size).id)]))
+                               Photo.objects.get(pk=option_value)._get_SIZE_url(self.image_size),#get_admin_thumbnail_url(),
+                               ''.join([custom_crop, '?_to_field=id&_popup=1&photo_id=', option_value, '&photosize_id=', str(PhotoSize.objects.get(name=self.image_size).id)]))
 
     def render_options(self, choices, selected_choices):
         # Normalize to strings.
         selected_choices = set(force_text(v) for v in selected_choices)
         output = []
-        for option_value, option_label in chain(self.choices, choices):
+        for option_value, option_label in chain(choices, self.choices):
             if len(output) > 15 and force_text(option_value) not in selected_choices:
                 continue
             if isinstance(option_label, (list, tuple)):
