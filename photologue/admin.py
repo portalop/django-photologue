@@ -208,7 +208,7 @@ class PhotoAdmin(admin.ModelAdmin):
         pk_value = obj._get_pk_val()
 
         if IS_POPUP_VAR in request.POST:
-            to_field = request.POST.get(TO_FIELD_VAR)
+            to_field = request.GET.get(TO_FIELD_VAR)
             if to_field:
                 attr = str(to_field)
             else:
@@ -221,12 +221,20 @@ class PhotoAdmin(admin.ModelAdmin):
             parametros = {
                 'pk_value': escape(pk_value), # for possible backwards-compatibility
                 'value': escape(value),
-                'obj': escapejs(obj)
+                'obj': escapejs(obj),
+                'is_photo': True,
+                'imagesize': '',
             }
             if request.GET.get('photosize'):
+                IMAGE_SIZES = getattr(settings, 'PHOTOLOGUE_IMAGE_SIZES', {})
+                im = IMAGE_SIZES.get(request.GET.get('photosize'), ())
+                obj._get_SIZE_url(request.GET.get('photosize'));
+                if len(im) > 2:
+                    for ims in im[2]:
+                        obj._get_SIZE_url(ims);
                 parametros.update({
-                    'photo_url': escape(obj._get_SIZE_url(request.GET.get('photosize'))),
-                    'crop_url': ''.join([custom_crop, '?photo_id=', escape(value), '&photosize_id=', str(PhotoSize.objects.get(name=request.GET.get('photosize')).id)])
+                    'photo_url': escape(obj._get_SIZE_url('admin_thumbnail')),
+                    'crop_url': ''.join([custom_crop, '?_to_field=id&_popup=1&photo_id=', escape(value), '&photosize_id=', str(PhotoSize.objects.get(name=request.GET.get('photosize')).id)]),
                 })
             return SimpleTemplateResponse('admin/photopicker_popup_response.html', parametros)
         return super(PhotoAdmin, self).response_add(request, obj, post_url_continue)
@@ -313,13 +321,27 @@ class CustomCropAdmin(admin.ModelAdmin):
         return ModelFormMetaClass
 
     def response_add(self, request, obj, post_url_continue=None):
-        pk_value = obj._get_pk_val()
+        pk_value = obj.photo._get_pk_val()
         if IS_POPUP_VAR in request.POST:
+            to_field = request.GET.get(TO_FIELD_VAR)
+            if to_field:
+                attr = str(to_field)
+            else:
+                attr = obj.photo._meta.pk.attname
+            value = obj.photo.serializable_value(attr)
+            custom_crop = reverse(
+                'admin:%s_%s_add'
+                % (self.model._meta.app_label, CustomCrop._meta.model_name), current_app=admin.site.name
+            )
+            obj.photo._get_SIZE_url(obj.photosize.name);
             return SimpleTemplateResponse('admin/photopicker_popup_response.html', {
                 'pk_value': escape(pk_value),  # for possible backwards-compatibility
-                'value': '',
+                'value': value,
                 'obj': escapejs(obj),
-                'photo_url': escape(obj.photo._get_SIZE_url(obj.photosize.name))
+                'is_photo': False,
+                'imagesize': obj.photosize.name,
+                'photo_url': escape(obj.photo._get_SIZE_url('admin_thumbnail')),
+                'crop_url': ''.join([custom_crop, '?_to_field=id&_popup=1&photo_id=', escape(value), '&photosize_id=', request.GET.get('photosize_id')])
             })
         return super(CustomCropAdmin, self).response_add(request, obj, post_url_continue)
 

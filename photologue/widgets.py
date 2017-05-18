@@ -6,6 +6,7 @@ import copy
 from itertools import chain
 from datetime import datetime
 
+from django.conf import settings
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.templatetags.admin_static import static
@@ -30,6 +31,7 @@ class PhotoWidget(forms.Widget):
         self.widget = widget
         self.model = model
         self.image_size = image_size
+        GALLERY_PAGINATE_BY = getattr(settings, 'PHOTOLOGUE_GALLERY_PAGINATE_BY', 20)
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
@@ -56,11 +58,10 @@ class PhotoWidget(forms.Widget):
         model = self.model
         info = (model._meta.app_label, model._meta.object_name.lower())
         photo_object = None
-        photo_url = ''
-        if value and value not in self.choices:
+        if value:
             photo_object = Photo.objects.get(id=value)
-            choices = ((value, photo_object),)
-            photo_url = photo_object._get_SIZE_url(self.image_size)
+            if value not in [val for val, obj in self.choices]:
+                choices = ((value, photo_object),)
         self.widget.choices = self.choices
         id = 'id_' + name
         add_image_link = reverse(
@@ -88,15 +89,36 @@ class PhotoWidget(forms.Widget):
         #     output.append('<a id="page_{0}_{1}"{2} href="#{0}" onclick="return load_images(\'{0}\', \'page\', {1});">{1}</a>'.format(id, page, ' class="active"' if page==1 else ''))
         # output.append('</p>')
         # output.append('</div></div><script type="text/javascript">$("#id_' + name + '").imagepicker({show_label:true});</script>')
+        IMAGE_SIZES = getattr(settings, 'PHOTOLOGUE_IMAGE_SIZES', {})
+        im = IMAGE_SIZES.get(self.image_size, ())
+        custom_crop_base_url = reverse(
+            'admin:%s_%s_add'
+            % (self.model._meta.app_label, CustomCrop._meta.model_name), current_app=admin.site.name
+        )
+        if photo_object:
+            custom_crop = ''.join([custom_crop_base_url, '?_to_field=id&_popup=1&photo_id=[PHOTO_ID]&photosize_id=', str(PhotoSize.objects.get(name=self.image_size).id)])
+            photo_url = photo_object._get_SIZE_url(self.image_size)
+        else:
+            custom_crop, photo_url = '', ''
+        imagesizes = [(im[0], im[1], photo_url, custom_crop, custom_crop.replace('[PHOTO_ID]', str(value)))]
+        if len(im) > 2:
+            for ims in im[2]:
+                if ims in IMAGE_SIZES:
+                    if photo_object:
+                        custom_crop = ''.join([custom_crop_base_url, '?_to_field=id&_popup=1&photo_id=[PHOTO_ID]&photosize_id=', str(PhotoSize.objects.get(name=ims).id)])
+                        photo_url = photo_object._get_SIZE_url(ims)
+                    else:
+                        custom_crop, photo_url = '', ''
+                    imagesizes.append((ims, IMAGE_SIZES[ims][1], photo_url, custom_crop, custom_crop.replace('[PHOTO_ID]', str(value))))
         return render_to_string('admin/image_picker.html', {
             'galleries': Gallery.objects.all(), 
             'options': self.render_options(choices, [value]), 
             'id': id, 
-            'image_size': self.image_size, 
+            'image_sizes': imagesizes, 
             'add_image_link': add_image_link, 
             'select_attrs': flatatt(self.build_attrs(attrs, name=name, id=id)),
             'paginator': Paginator(self.choices, 15),
-            'photo_url': photo_url
+            'photo_url': photo_url,
         })
         # return mark_safe(''.join(output))
 
@@ -121,21 +143,16 @@ class PhotoWidget(forms.Widget):
        #         custom_crop = 'add'
        #     custom_crop = 'add'
        #     if custom_crop == 'add':
-            custom_crop = reverse(
-                'admin:%s_%s_add'
-                % (self.model._meta.app_label, CustomCrop._meta.model_name), current_app=admin.site.name
-            )
        #     else:
        #         custom_crop = reverse(
        #             'admin:%s_%s_change'
        #             % (self.model._meta.app_label, CustomCrop._meta.model_name), current_app=admin.site.name, args=[custom_crop]
        #         )
-            return format_html('<option data-img-src="{3}" data-crop-url="{4}" value="{0}"{1}>{2}</option>',
+            return format_html('<option data-img-src="{3}" value="{0}"{1}>{2}</option>',
                                option_value,
                                selected_html,
                                force_text(option_label),
-                               Photo.objects.get(pk=option_value)._get_SIZE_url(self.image_size),#get_admin_thumbnail_url(),
-                               ''.join([custom_crop, '?_to_field=id&_popup=1&photo_id=', option_value, '&photosize_id=', str(PhotoSize.objects.get(name=self.image_size).id)]))
+                               Photo.objects.get(pk=option_value)._get_SIZE_url('admin_thumbnail'))
 
     def render_options(self, choices, selected_choices):
         # Normalize to strings.

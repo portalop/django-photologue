@@ -153,10 +153,10 @@ class ImageLookupView(View):
           if selected_photo not in photos_list:
             photos_list.insert(0, selected_photo)
         for photo in photos_list:
-            options.append(format_html('<option data-img-src="{1}" data-crop-url="{2}" value="{0}">',
+            photo._get_SIZE_url(self.request.GET["image_size"])
+            options.append(format_html('<option data-img-src="{1}" value="{0}">',
                                         photo.id,
-                                        photo._get_SIZE_url(self.request.GET["image_size"]),
-                                        ''.join([custom_crop, '?_to_field=id&_popup=1&photo_id=', str(photo.id), '&photosize_id=', str(PhotoSize.objects.get(name=self.request.GET["image_size"]).id)])) + unicode(photo) + '</option>')
+                                        photo._get_SIZE_url('admin_thumbnail')))
         resp = {'new_options': ''.join(options), 'pages': list(paginas.page_range)}
         return HttpResponse(json.dumps(resp), content_type="application/json" )
     make_object_list = True

@@ -48,10 +48,10 @@ ul.thumbnails.image_picker_selector {
       display: inline-block;}
 
 
-div.image_picker_wrapper p.links {
+div.image_picker_wrapper div.links {
   padding: 10px;
 }
-div.image_picker_wrapper p.links a {
+div.image_picker_wrapper div.links a {
   margin-left: 10px;
   text-decoration: underline;
   padding: 3px 7px;
@@ -62,6 +62,10 @@ div.image_picker_wrapper p.links a {
   -o-border-radius:3px;
   border-radius:3px
 }
+div.image_picker_wrapper div.links div.image_size {
+  float: left;
+  padding: 10px;
+}
 
 div.image_picker_wrapper div.menu a.active {
   background-color: #0088cc;
@@ -70,4 +74,8 @@ div.image_picker_wrapper div.menu a.active {
 
 div.image_picker_wrapper .menu {
   width: 100%;
+}
+
+div.image_picker_wrapper .image_picker_selector {
+  clear: both;
 }

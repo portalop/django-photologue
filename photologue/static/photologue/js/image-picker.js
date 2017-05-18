@@ -69,13 +69,14 @@
         exclude_ids.push(this.value);
     });
     */
+    var selected_id = $sel.val();
     $.ajax({
       url: $sel.data("lookup-path"),
       data: {
         //"exclude_ids": exclude_ids.join(','), 
-        "image_size": $sel.data("use-admin-thumbnail")?'admin_thumbnail':$sel.data("image-size"),
+        "image_size": $sel.data("use-admin-thumbnail"),
         "gallery_id": $sel.data("gallery"),
-        "selected_id": $sel.val(),
+        "selected_id": selected_id,
         "search": $sel.data("search"),
         "page": $sel.data("page")
       },
@@ -84,11 +85,17 @@
         pages = menu.find('.pages')
         pages.empty();
         pages.append('Páginas: ');
-        for (var i = 0; i < data.pages.length; i++)
+        for (var i = 0; i < data.pages.length && i < 20; i++)
           pages.append('<a id="page_' + id + '_' + data.pages[i] + '" href="#' + id + '" onclick="return load_images(\'' + id + '\', \'page\', ' + data.pages[i] + ')"' + (($sel.data("page")==data.pages[i])?' class="active"':'') + '>' + data.pages[i] + '</a>');
-
+        if (data.pages.length > 20) {
+          var more_pages = '<a id="more_pages_' + id + '_' + data.pages[i] + '" href="#' + id + '" onclick="$(\'#more_pages_' + id + '_' + data.pages[i] + '\').hide(); $(\'#container_pages_' + id + '_' + data.pages[i] + '\').show(); return false;">...</a><span id="container_pages_' + id + '_' + data.pages[i] + '" style="display: none">';
+          for (var i = 20; i < data.pages.length; i++)
+            more_pages += '<a id="page_' + id + '_' + data.pages[i] + '" href="#' + id + '" onclick="return load_images(\'' + id + '\', \'page\', ' + data.pages[i] + ')"' + (($sel.data("page")==data.pages[i])?' class="active"':'') + '>' + data.pages[i] + '</a>';
+          pages.append(more_pages + '</span>');
+        }
         $sel.empty();
         $sel.append(data.new_options);
+        $sel.val(selected_id);
         $sel.imagepicker($sel.data("picker").opts);
         $sel.data("picker").picker.find('li.menu').remove();
         $sel.data("picker").picker.prepend(menu);
@@ -100,10 +107,16 @@
     });
   }
 
-  refreshImagePicker = function(win, newId, photo_url, crop_url) {
+  refreshImagePicker = function(win, newId, obj, photo_url, crop_url, is_photo, imagesize) {
+    var name = windowname_to_id(win.name);
+    if (is_photo == "True") {
+      var elem = document.getElementById(name);
+      elem.options[elem.options.length] = new Option(obj, newId, true, true);
+    }
+    else
+      name = name.replace("_" + imagesize, "")
     newId = html_unescape(newId);
     photo_url = html_unescape(photo_url);
-    var name = windowname_to_id(win.name);
 
     $('img.image_picker_image').each(function() {
         if (getFileNameFromUrl(this.src) == getFileNameFromUrl(photo_url))
@@ -115,13 +128,23 @@
         $("#" + name + " option").each(function() {
             if (this.value == newId) {
                 $(this).attr("data-img-src", photo_url);
-                $(this).attr("data-crop-url", crop_url);
                 $(this).insertBefore($("#" + name + " option:eq(0)"));
             }
         });
+        $sel.val(newId);
         $sel.imagepicker($sel.data("picker").opts);
     }
-    $sel.parent().find("img.selected_image").attr("src", photo_url + "?" + new Date().getTime());
+    $.each($sel.parent().find(".image_size"), function(i, v) {
+      selected_image = $(v).find("img.selected_image");
+      img_src = photo_url.replace('admin_thumbnail', selected_image.data('image-size')) + "?" + new Date().getTime();
+      $.ajax({
+        url: img_src
+      });
+      selected_image.attr("src", img_src);
+      enlace = $(v).find("a");
+      enlace.attr("href", enlace.data('crop-url').replace('[PHOTO_ID]', newId));
+    });
+    win.close();
   }
 
   sanitized_options = function(opts) {
@@ -302,7 +325,13 @@
           this.select.parent().find("img.selected_image").attr("src", "");
         } else {
           this.select.val(selected_value);
-          this.select.parent().find("img.selected_image").attr("src", imagepicker_option.option.data("img-src") + "?" + new Date().getTime());
+          $.each(this.select.parent().find(".image_size"), function(i, v) {
+            //alert($(v));
+            selected_image = $(v).find("img.selected_image");
+            selected_image.attr("src", imagepicker_option.option.data("img-src").replace('admin_thumbnail', selected_image.data('image-size')) + "?" + new Date().getTime());
+            enlace = $(v).find("a");
+            enlace.attr("href", enlace.data('crop-url').replace('[PHOTO_ID]', selected_value));
+          });
         }
       }
       if (!both_array_are_equal(old_values, this.selected_values())) {
@@ -311,8 +340,8 @@
           return this.opts.changed.call(this.select, old_values, this.selected_values());
         }
       }
+      toggleImagePicker(this.select.data('id'));
     };
-
     return ImagePicker;
 
   })();
@@ -381,11 +410,12 @@
     };
 
     ImagePickerOption.prototype.create_node = function() {
-      var image, thumbnail, crop_link;
+      var image, thumbnail;
       this.node = jQuery("<li/>");
       image = jQuery("<img class='image_picker_image'/>");
-      crop_link = jQuery("<p/>").html(jQuery("<a id='add_" + this.picker.select.data("id") + "' href='" + this.option.data("crop-url") + "' onclick='return showAddAnotherPopup(this);'/>").html("Recortar"));
-      image.attr("src", this.option.data("img-src"));
+//      crop_link = jQuery("<p/>").html(jQuery("<a id='add_" + this.picker.select.data("id") + "' href='" + this.option.data("crop-url") + "' onclick='return showAddAnotherPopup(this);'/>").html("Recortar"));
+      if (this.option.data("img-src"))
+        image.attr("src", this.option.data("img-src").replace('admin_thumbnail', this.picker.select.data("use-admin-thumbnail")));
       thumbnail = jQuery("<div class='thumbnail'>");
       thumbnail.click({
         option: this
@@ -397,7 +427,7 @@
         thumbnail.append(jQuery("<p/>").html(this.label()));
       }
       this.node.append(thumbnail);
-      this.node.append(crop_link);
+//      this.node.append(crop_link);
       return this.node;
     };
     return ImagePickerOption;

@@ -3,9 +3,8 @@
   <head><title></title></head>
   <body>
     <script type="text/javascript">
-      opener.dismissAddAnotherPopup(window, "{{ value }}", "{{ obj }}");
       if (typeof(opener.refreshImagePicker) == typeof(Function))
-        opener.refreshImagePicker(window, "{{ value }}", "{{ photo_url }}", "{{ crop_url }}");
+        opener.refreshImagePicker(window, "{{ value }}", "{{ obj }}", "{{ photo_url }}", "{{ crop_url }}", "{{ is_photo }}", "{{ imagesize }}");
     </script>
   </body>
 </html>
