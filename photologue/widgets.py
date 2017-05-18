@@ -153,6 +153,7 @@ class PhotoWidget(forms.Widget):
        #             'admin:%s_%s_change'
        #             % (self.model._meta.app_label, CustomCrop._meta.model_name), current_app=admin.site.name, args=[custom_crop]
        #         )
+            Photo.objects.get(pk=option_value)._get_SIZE_url(self.image_size)
             return format_html('<option data-img-src="{3}" value="{0}"{1}>{2}</option>',
                                option_value,
                                selected_html,
