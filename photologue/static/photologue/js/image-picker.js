@@ -331,6 +331,7 @@
             selected_image.attr("src", imagepicker_option.option.data("img-src").replace('admin_thumbnail', selected_image.data('image-size')) + "?" + new Date().getTime());
             enlace = $(v).find("a");
             enlace.attr("href", enlace.data('crop-url').replace('[PHOTO_ID]', selected_value));
+            $(enlace).show();
           });
         }
       }
