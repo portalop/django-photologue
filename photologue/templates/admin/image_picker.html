@@ -4,7 +4,7 @@
             <div class="image_size">
                 <img src="{{ imagesize.2 }}?{% now 'u' %}" class="selected_image" data-image-size="{{ imagesize.0 }}" />
                 <p>Tamaño de imagen: {{ imagesize.0 }} ({{ imagesize.1 }})<br />
-                <a id="add_{{ id }}_{{ imagesize.0 }}" href="{{ imagesize.4 }}" data-crop-url="{{ imagesize.3 }}" onclick="return showAddAnotherPopup(this);">Recortar</a></p>
+                <a id="add_{{ id }}_{{ imagesize.0 }}" href="{{ imagesize.4 }}" data-crop-url="{{ imagesize.3 }}" onclick="return showAddAnotherPopup(this);"{% if not imagesize.4 %} style="display: none"{% endif %}>Recortar</a></p>
             </div>
         {% endfor %}
         <a id="add_{{ id }}" href="{{ add_image_link }}?photosize={{ image_sizes.0.0 }}&_popup=1&_to_field=id" onclick="return showAddAnotherPopup(this);">+ Añadir imagen nueva</a>

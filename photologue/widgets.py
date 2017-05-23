@@ -104,8 +104,8 @@ class PhotoWidget(forms.Widget):
             custom_crop = ''.join([custom_crop_base_url, '?_to_field=id&_popup=1&photo_id=[PHOTO_ID]&photosize_id=', str(PhotoSize.objects.get(name=self.image_size).id)])
             photo_url = photo_object._get_SIZE_url(self.image_size)
         else:
-            custom_crop, photo_url = '', ''
-        imagesizes = [(im[0], im[1], photo_url, custom_crop, custom_crop.replace('[PHOTO_ID]', str(value)))]
+            custom_crop, photo_url = ''.join([custom_crop_base_url, '?_to_field=id&_popup=1&photo_id=[PHOTO_ID]&photosize_id=', str(PhotoSize.objects.get(name=self.image_size).id)]), ''
+        imagesizes = [(im[0], im[1], photo_url, custom_crop, custom_crop.replace('[PHOTO_ID]', str(value)) if value else '')]
         if len(im) > 2:
             for ims in im[2]:
                 if ims in IMAGE_SIZES:
@@ -113,8 +113,8 @@ class PhotoWidget(forms.Widget):
                         custom_crop = ''.join([custom_crop_base_url, '?_to_field=id&_popup=1&photo_id=[PHOTO_ID]&photosize_id=', str(PhotoSize.objects.get(name=ims).id)])
                         photo_url = photo_object._get_SIZE_url(ims)
                     else:
-                        custom_crop, photo_url = '', ''
-                    imagesizes.append((ims, IMAGE_SIZES[ims][1], photo_url, custom_crop, custom_crop.replace('[PHOTO_ID]', str(value))))
+                        custom_crop, photo_url = ''.join([custom_crop_base_url, '?_to_field=id&_popup=1&photo_id=[PHOTO_ID]&photosize_id=', str(PhotoSize.objects.get(name=ims).id)]), ''
+                    imagesizes.append((ims, IMAGE_SIZES[ims][1], photo_url, custom_crop, custom_crop.replace('[PHOTO_ID]', str(value)) if value else ''))
         return render_to_string('admin/image_picker.html', {
             'galleries': Gallery.objects.all(), 
             'options': self.render_options(choices, [value]), 
