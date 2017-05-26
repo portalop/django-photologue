@@ -15,7 +15,10 @@ from django.core.paginator import Paginator
 from django.utils.safestring import mark_safe
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext as _
-from django.forms.widgets import flatatt
+try:
+    from django.forms.widgets import flatatt
+except ImportError:
+    from django.forms.utils import flatatt
 from django.utils.html import format_html
 from django.template.loader import render_to_string
 from photologue.models import Photo, Gallery, CustomCrop, PhotoSize
@@ -116,7 +119,7 @@ class PhotoWidget(forms.Widget):
             'id': id, 
             'image_sizes': imagesizes, 
             'add_image_link': add_image_link, 
-            'select_attrs': flatatt(self.build_attrs(attrs, name=name, id=id)),
+            'select_attrs': flatatt(self.build_attrs(self.attrs, attrs, name=name, id=id)),
             'paginator': Paginator(self.choices, 15),
             'photo_url': photo_url,
         })
@@ -171,10 +174,19 @@ class PhotoWidget(forms.Widget):
                 output.append(self.render_option(selected_choices, option_value, option_label))
         return '\n'.join(output)
 
-    def build_attrs(self, extra_attrs=None, **kwargs):
-        "Helper function for building an attribute dictionary."
-        self.attrs = self.widget.build_attrs(extra_attrs=None, **kwargs)
-        return self.attrs
+    # def build_attrs(self, extra_attrs=None, **kwargs):
+    #     "Helper function for building an attribute dictionary."
+    #     self.attrs = self.widget.build_attrs(extra_attrs=None, **kwargs)
+    #     return self.attrs
+    def build_attrs(self, base_attrs, extra_attrs=None, **kwargs):
+        """
+        Helper function for building an attribute dictionary.
+        This is combination of the same method from Django<=1.10 and Django1.11+
+        """
+        attrs = dict(base_attrs, **kwargs)
+        if extra_attrs:
+            attrs.update(extra_attrs)
+        return attrs
 
 class CustomCropWidget(forms.Widget):
     def __init__(self, widget, photo, photosize):
