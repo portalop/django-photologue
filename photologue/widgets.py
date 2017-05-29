@@ -31,9 +31,11 @@ class PhotoWidget(forms.Widget):
         self.needs_multipart_form = widget.needs_multipart_form
         self.attrs = widget.attrs
         self.choices = widget.choices
+        widget.can_add_related = False
         self.widget = widget
         self.model = model
         self.image_size = image_size
+        self.can_add_related = False
         GALLERY_PAGINATE_BY = getattr(settings, 'PHOTOLOGUE_GALLERY_PAGINATE_BY', 20)
 
     def __deepcopy__(self, memo):
