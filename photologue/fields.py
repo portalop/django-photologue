@@ -10,6 +10,7 @@ class PhotoFormField(forms.ModelChoiceField):
     def __init__(self, *args, **kwargs):
         self.image_size = kwargs.pop('image_size', 'thumbnail')
         self.widget = PhotoWidget(forms.Select(), Photo, self.image_size)
+        self.widget.can_add_related = False
         super(PhotoFormField, self).__init__(*args, **kwargs)
         #photo_ids = [photo.id for photo in Photo.objects.all().order_by('-date_added')[:15]]
         #photo_ids.append(self.initial)
